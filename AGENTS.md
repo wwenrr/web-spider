@@ -36,3 +36,8 @@
 
 ## Verification Rule
 - After any code or configuration change, always run `poetry run lint` to verify before reporting completion.
+
+## NiceGUI Native Elements Rule
+- For UI work in this repository, prefer native DOM composition with `ui.element(...)` and CSS.
+- Avoid NiceGUI Quasar convenience components for new UI (`ui.input`, `ui.button`, `ui.table`, `ui.dialog`, etc.) unless the user explicitly asks to use them.
+- When a screen already exists with Quasar components and needs restyling, prioritize replacing those controls with native elements in the touched scope.

@@ -1,0 +1,51 @@
+@media (max-width: 960px) {
+  .nav {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .content {
+    margin-left: 0;
+    padding: 24px 16px;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .page-body > * { max-width: none; }
+  .todo-create-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .todo-input {
+    min-width: 0;
+    width: 100%;
+  }
+  .todo-row-body {
+    flex-wrap: wrap !important;
+  }
+  .todo-row-body .todo-input {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+  .cdp-actions-row { justify-content: flex-start; flex-wrap: wrap; }
+  .monitor-metrics {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .monitor-job-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .monitor-job-time { text-align: left; }
+  .monitor-command {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .shell {
+    flex-direction: column;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  html,
+  body { overflow: auto !important; }
+}

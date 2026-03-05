@@ -1,0 +1,312 @@
+/*
+ * Quasar / NiceGUI global reset
+ * Neutralises the framework's default colours, shadows, typography,
+ * and spacing so that only the app's custom design tokens apply.
+ */
+
+/* ── Box-model reset ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Typography: strip Quasar's Roboto / system-font stack ────── */
+body,
+.q-page,
+.q-layout,
+.q-page-container,
+.nicegui-content,
+.q-card,
+.q-btn,
+.q-input,
+.q-field,
+.q-table,
+.q-dialog,
+.q-toolbar,
+.q-chip,
+.q-tab,
+.q-tabs,
+.q-item,
+.q-list,
+.q-select,
+.q-textarea,
+.q-toggle,
+.q-badge {
+  font-family: var(--font-family) !important;
+  letter-spacing: normal !important;
+}
+
+/* ── Quasar colour overrides: force theme tokens ──────────────── */
+.q-btn--standard,
+.q-btn--flat,
+.q-btn--outline,
+.q-btn--unelevated {
+  box-shadow: none !important;
+}
+.q-card {
+  box-shadow: none !important;
+  border-radius: 12px !important;
+}
+.q-dialog__inner > .q-card {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ── NiceGUI layout wrappers: strip default padding / gaps ────── */
+.nicegui-content {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+.q-page {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+.q-page-container {
+  padding: 0 !important;
+}
+.q-layout {
+  min-height: 0 !important;
+}
+
+/* ── Quasar helper class neutralisation ───────────────────────── */
+.q-ma-none,
+.q-pa-none {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* ── Input / Field resets ─────────────────────────────────────── */
+.q-field {
+  width: 100%;
+}
+.q-field--outlined .q-field__control {
+  border-radius: 8px !important;
+  padding: 0 12px !important;
+}
+.q-field--outlined .q-field__control::before {
+  border-color: var(--color-border) !important;
+}
+.q-field--outlined .q-field__control:hover::before {
+  border-color: var(--color-text-3) !important;
+}
+.q-field--outlined.q-field--focused .q-field__control::before {
+  border-color: var(--color-accent) !important;
+  border-width: 1.5px !important;
+}
+.q-field--dense .q-field__control {
+  min-height: 40px !important;
+}
+.q-field__label {
+  color: var(--color-text-2) !important;
+  font-weight: 500 !important;
+}
+.q-field__native,
+.q-field__input {
+  color: var(--color-text) !important;
+  font-size: 14px !important;
+  padding: 8px 0 !important;
+}
+.q-field__native::placeholder,
+.q-field__input::placeholder {
+  color: var(--color-text-3) !important;
+  opacity: 1 !important;
+}
+.q-field__marginal {
+  height: auto !important;
+}
+.q-textarea .q-field__control {
+  padding: 8px 12px !important;
+}
+.q-textarea .q-field__native {
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  padding: 4px 0 !important;
+}
+
+/* ── Button resets ────────────────────────────────────────────── */
+.q-btn {
+  font-family: var(--font-family) !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  min-height: 36px !important;
+  transition: background 160ms ease, transform 120ms ease !important;
+}
+.q-btn .q-btn__content {
+  gap: 6px;
+}
+.q-btn--flat {
+  color: var(--color-text-2) !important;
+  background: transparent !important;
+}
+.q-btn--flat:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+.q-btn--flat .q-focus-helper {
+  display: none !important;
+}
+.q-btn--outline {
+  border: 1.5px solid var(--color-border) !important;
+  color: var(--color-text-2) !important;
+}
+.q-btn--outline:hover {
+  border-color: var(--color-text-3) !important;
+  background: rgba(0, 0, 0, 0.02) !important;
+}
+.q-btn--round {
+  padding: 0 !important;
+}
+
+/* ── Toggle / Switch resets ───────────────────────────────────── */
+.q-toggle__inner--falsy {
+  color: var(--color-text-3) !important;
+}
+.q-toggle__track {
+  opacity: 0.6 !important;
+}
+
+/* ── Card resets ──────────────────────────────────────────────── */
+.q-card__section {
+  padding: 0 !important;
+}
+.q-card > .q-card__section:first-child {
+  padding: 0 !important;
+}
+.q-card__actions {
+  padding: 0 !important;
+}
+
+/* ── Dialog resets ────────────────────────────────────────────── */
+.q-dialog__backdrop {
+  background: rgba(0, 0, 0, 0.25) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* ── Separator resets ─────────────────────────────────────────── */
+.q-separator {
+  background: var(--color-border) !important;
+}
+
+/* ── Chip resets ──────────────────────────────────────────────── */
+.q-chip {
+  font-family: var(--font-family) !important;
+  border-radius: 999px !important;
+}
+
+/* ── Table (Quasar native q-table) resets ─────────────────────── */
+.q-table {
+  box-shadow: none !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px !important;
+}
+.q-table thead th {
+  font-family: var(--font-family) !important;
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+  color: var(--color-text-2) !important;
+  background: #F8FAFC !important;
+}
+.q-table tbody td {
+  font-family: var(--font-family) !important;
+  font-size: 14px !important;
+  color: var(--color-text) !important;
+}
+.q-table tbody tr:hover td {
+  background: var(--color-bg-alt) !important;
+}
+
+/* ── Linear progress resets ───────────────────────────────────── */
+.q-linear-progress {
+  border-radius: 4px !important;
+  overflow: hidden !important;
+}
+.q-linear-progress__track {
+  background: var(--color-border) !important;
+  opacity: 1 !important;
+}
+.q-linear-progress__model {
+  background: var(--color-accent) !important;
+}
+
+/* ── Notification / Banner resets ─────────────────────────────── */
+.q-notification {
+  font-family: var(--font-family) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ── Tooltip resets ───────────────────────────────────────────── */
+.q-tooltip {
+  font-family: var(--font-family) !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  background: #1E293B !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  max-width: 240px !important;
+}
+
+/* ── Scrollbar (thin, muted) ──────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+/* ── Quasar ripple effect: mute to theme ──────────────────────── */
+.q-ripple {
+  color: var(--color-accent) !important;
+  opacity: 0.12 !important;
+}
+
+/* ── Remove Quasar header/footer if not used ──────────────────── */
+.q-header,
+.q-footer {
+  display: none !important;
+}
+
+/* ── Selection highlight ──────────────────────────────────────── */
+::selection {
+  background: rgba(64, 197, 124, 0.2);
+  color: var(--color-text);
+}
+
+/* ── Focus ring override: consistent accent ring ──────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: 2px !important;
+}
+.q-field--focused .q-field__control {
+  box-shadow: 0 0 0 2px rgba(64, 197, 124, 0.15) !important;
+}
+
+/* ── Number input: hide browser spinners ──────────────────────── */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}

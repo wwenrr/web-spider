@@ -1,6 +1,8 @@
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Final, cast
+from datetime import datetime
+from html import escape
+from typing import Final
 
 from nicegui import ui
 
@@ -30,65 +32,277 @@ class ConnectionFormValues:
 
 
 def render_cdp_connection_crud_section() -> None:
-    with ui.card().classes("card cdp-crud-card"):
-        ui.label("Create CDP Connection").classes("field-label")
-        create_fields = _render_form_fields()
+    state: dict[str, object] = {
+        "show_create": False,
+        "editing_id": None,
+    }
 
-        with ui.row().classes("cdp-create-actions"):
-            ui.button(
-                "Add Connection",
-                on_click=lambda: _create_connection(
-                    create_fields,
-                    refresh_list=render_connections.refresh,
-                    clear_form=lambda: _reset_form_fields(create_fields),
-                ),
-            ).props("unelevated no-caps size=sm").classes("btn-primary cdp-submit-btn")
+    with ui.element("div").classes("card cdp-crud-card"):
+        _render_chrome_debug_note()
 
         @ui.refreshable
-        def render_connections() -> None:
+        def render_index() -> None:
             connections = list_cdp_connections()
-            if not connections:
-                ui.label("No CDP connections yet. Add one above to get started.").classes("todo-empty")
-                return
+            editing_connection = _find_connection(connections, state["editing_id"])
+            if editing_connection is None:
+                state["editing_id"] = None
 
-            with ui.column().classes("cdp-list"):
+            _render_toolbar(state, render_index.refresh)
+
+            if bool(state["show_create"]):
+                _render_create_panel(render_index.refresh, state)
+
+            _render_connections_table(connections, refresh_index=render_index.refresh, state=state)
+
+            if editing_connection is not None:
+                _render_edit_panel(editing_connection, render_index.refresh, state)
+
+        render_index()
+
+
+def _render_toolbar(state: dict[str, object], refresh_index: Callable[[], None]) -> None:
+    with ui.element("div").classes("cdp-toolbar"):
+        _render_text("span", "Connection Index", "field-label cdp-toolbar-title")
+        ui.element("div").classes("cdp-spacer")
+        button_label = "Close Create" if bool(state["show_create"]) else "Create Connection"
+        _render_native_button(
+            label=button_label,
+            classes="cdp-btn cdp-btn--primary",
+            on_click=lambda _event=None: _toggle_create_panel(state, refresh_index),
+        )
+
+
+def _render_create_panel(refresh_index: Callable[[], None], state: dict[str, object]) -> None:
+    with ui.element("div").classes("cdp-panel"):
+        _render_text("span", "Create CDP Connection", "field-label cdp-panel-title")
+        form_key = "create"
+        _render_native_form(form_key=form_key, connection=None)
+
+        async def on_create(_event: object | None = None) -> None:
+            await _create_connection_from_form(form_key, refresh_index, state)
+
+        with ui.element("div").classes("cdp-form-actions"):
+            _render_native_button(
+                label="Cancel",
+                classes="cdp-btn cdp-btn--ghost",
+                on_click=lambda _event=None: _close_create_panel(state, refresh_index),
+            )
+            _render_native_button(
+                label="Create",
+                classes="cdp-btn cdp-btn--primary",
+                on_click=on_create,
+            )
+
+
+def _render_connections_table(
+    connections: list[CdpConnection],
+    refresh_index: Callable[[], None],
+    state: dict[str, object],
+) -> None:
+    if not connections:
+        _render_text("span", "No CDP connections yet. Click Create Connection to add one.", "todo-empty")
+        return
+
+    with ui.element("div").classes("cdp-table-wrap"):
+        with ui.element("table").classes("cdp-table"):
+            with ui.element("colgroup"):
+                _render_table_col("14%")
+                _render_table_col("11%")
+                _render_table_col("8%")
+                _render_table_col("11%")
+                _render_table_col("20%")
+                _render_table_col("12%")
+                _render_table_col("12%")
+                _render_table_col("12%")
+            with ui.element("thead"):
+                with ui.element("tr"):
+                    _render_table_head("Name")
+                    _render_table_head("Host")
+                    _render_table_head("Port")
+                    _render_table_head("Browser")
+                    _render_table_head("Path")
+                    _render_table_head("Status")
+                    _render_table_head("Updated")
+                    _render_table_head("Actions")
+
+            with ui.element("tbody"):
                 for connection in connections:
-                    _render_connection_row(connection, refresh_list=render_connections.refresh)
-
-        render_connections()
+                    _render_table_row(connection, refresh_index, state)
 
 
-def _render_connection_row(connection: CdpConnection, refresh_list: Callable[[], None]) -> None:
-    with ui.element("div").classes("cdp-row"):
-        with ui.column().classes("gap-0 cdp-row-header"):
-            ui.label(connection.name).classes("todo-title")
-            ui.label(f"{connection.host}:{connection.port} • {connection.browser}").classes("todo-id")
-            ui.label(connection.ws_path).classes("todo-id")
+def _render_table_row(
+    connection: CdpConnection,
+    refresh_index: Callable[[], None],
+    state: dict[str, object],
+) -> None:
+    with ui.element("tr"):
+        _render_table_cell(connection.name)
+        _render_table_cell(connection.host)
+        _render_table_cell(str(connection.port), mono=True)
+        _render_table_cell(connection.browser)
+        _render_table_cell(connection.ws_path, mono=True)
+        _render_status_cell(connection.is_active)
+        _render_table_cell(_format_timestamp(connection.updated_at), mono=True)
 
-        edit_fields = _render_form_fields(connection)
+        with ui.element("td").classes("cdp-td cdp-td-actions"):
+            with ui.element("div").classes("cdp-actions-row"):
+                _render_native_button(
+                    label="Edit",
+                    classes="cdp-btn cdp-btn--outline",
+                    on_click=lambda _event=None, target_id=connection.id: _open_edit_panel(
+                        target_id,
+                        state,
+                        refresh_index,
+                    ),
+                )
+                _render_native_button(
+                    label="Delete",
+                    classes="cdp-btn cdp-btn--danger",
+                    on_click=lambda _event=None, connection_id=connection.id: _delete_connection(
+                        connection_id,
+                        refresh_index,
+                        state,
+                    ),
+                )
 
-        with ui.row().classes("cdp-actions-row"):
-            ui.button(
-                "Save",
-                on_click=lambda connection_id=connection.id: _update_connection(
-                    connection_id,
-                    edit_fields,
-                    refresh_list,
-                ),
-            ).props("unelevated no-caps size=sm").classes("btn-primary")
-            ui.button(
-                "Delete",
-                on_click=lambda connection_id=connection.id: _delete_connection(connection_id, refresh_list),
-            ).props("flat no-caps color=red-7 size=sm")
+
+def _render_edit_panel(
+    connection: CdpConnection,
+    refresh_index: Callable[[], None],
+    state: dict[str, object],
+) -> None:
+    with ui.element("div").classes("cdp-panel"):
+        _render_text("span", f"Edit Connection #{connection.id}", "field-label cdp-panel-title")
+        form_key = f"edit-{connection.id}"
+        _render_native_form(form_key=form_key, connection=connection)
+
+        async def on_save(_event: object | None = None) -> None:
+            await _update_connection_from_form(connection.id, form_key, refresh_index, state)
+
+        with ui.element("div").classes("cdp-form-actions"):
+            _render_native_button(
+                label="Cancel",
+                classes="cdp-btn cdp-btn--ghost",
+                on_click=lambda _event=None: _close_edit_panel(state, refresh_index),
+            )
+            _render_native_button(
+                label="Save",
+                classes="cdp-btn cdp-btn--primary",
+                on_click=on_save,
+            )
 
 
-def _create_connection(
-    fields: dict[str, object],
-    refresh_list: Callable[[], None],
-    clear_form: Callable[[], None],
+def _render_chrome_debug_note() -> None:
+    with ui.element("div").classes("cdp-note-box"):
+        _render_text("span", "Run Chrome with remote debugging:", "cdp-note-title")
+        _render_text(
+            "code",
+            'google-chrome --remote-debugging-port=9222 --user-data-dir="/tmp/chrome-debug-profile/"',
+            "cdp-note-command",
+        )
+
+
+def _render_native_form(form_key: str, connection: CdpConnection | None) -> None:
+    defaults = _defaults_from_connection(connection)
+    checked = " checked" if defaults.is_active else ""
+
+    with ui.element("div").classes("cdp-native-form").props(f'data-form-key="{form_key}"'):
+        ui.html(
+            f'<input id="{form_key}-name" class="cdp-native-input" type="text" '
+            f'placeholder="Connection name" value="{escape(defaults.name)}">'
+        )
+        ui.html(
+            f'<input id="{form_key}-host" class="cdp-native-input" type="text" '
+            f'placeholder="127.0.0.1" value="{escape(defaults.host)}">'
+        )
+        ui.html(
+            f'<input id="{form_key}-port" class="cdp-native-input" type="number" min="1" max="65535" '
+            f'value="{defaults.port}">'
+        )
+        ui.html(
+            f'<input id="{form_key}-browser" class="cdp-native-input" type="text" '
+            f'placeholder="chrome" value="{escape(defaults.browser)}">'
+        )
+        ui.html(
+            f'<input id="{form_key}-ws-path" class="cdp-native-input" type="text" '
+            f'placeholder="/devtools/browser" value="{escape(defaults.ws_path)}">'
+        )
+        ui.html(
+            f'<input id="{form_key}-username" class="cdp-native-input" type="text" '
+            f'placeholder="Username (optional)" value="{escape(defaults.username or "")}">'
+        )
+        ui.html(
+            f'<input id="{form_key}-password" class="cdp-native-input" type="password" '
+            f'placeholder="Password (optional)" value="{escape(defaults.password or "")}">'
+        )
+        ui.html(
+            f'<textarea id="{form_key}-notes" class="cdp-native-textarea" '
+            f'placeholder="Notes (optional)">{escape(defaults.notes or "")}</textarea>'
+        )
+        ui.html(
+            f'<label class="cdp-native-switch">'
+            f'<input id="{form_key}-is-active" type="checkbox"{checked}>'
+            f'<span>Active</span>'
+            f"</label>"
+        )
+
+
+def _render_native_button(label: str, classes: str, on_click: Callable[..., object]) -> None:
+    with ui.element("button").classes(classes).props("type=button").on("click", on_click):
+        _render_text("span", label, "cdp-btn-label")
+
+
+def _render_table_col(width: str) -> None:
+    ui.element("col").style(f"width: {width};")
+
+
+def _render_table_head(label: str) -> None:
+    with ui.element("th").classes("cdp-th"):
+        _render_text("span", label, "cdp-th-label")
+
+
+def _render_table_cell(value: str, mono: bool = False) -> None:
+    with ui.element("td").classes("cdp-td"):
+        classes = "cdp-td-text cdp-td-text--mono" if mono else "cdp-td-text"
+        _render_text("span", value, classes)
+
+
+def _render_status_cell(is_active: bool) -> None:
+    with ui.element("td").classes("cdp-td"):
+        with ui.element("span").classes("cdp-status"):
+            dot_classes = "cdp-status-dot cdp-status-dot--active" if is_active else "cdp-status-dot cdp-status-dot--inactive"
+            ui.element("span").classes(dot_classes)
+            _render_text("span", "Active" if is_active else "Inactive", "cdp-status-label")
+
+
+def _render_text(tag: str, text: str, classes: str) -> None:
+    with ui.element(tag).classes(classes):
+        ui.html(escape(text))
+
+
+def _format_timestamp(raw_time: object) -> str:
+    if isinstance(raw_time, datetime):
+        return raw_time.strftime("%d/%m/%Y")
+
+    normalized = str(raw_time or "").strip()
+    if normalized == "":
+        return "-"
+
+    try:
+        parsed = datetime.fromisoformat(normalized.replace("Z", "+00:00"))
+    except ValueError:
+        return normalized
+
+    return parsed.strftime("%d/%m/%Y")
+
+
+async def _create_connection_from_form(
+    form_key: str,
+    refresh_index: Callable[[], None],
+    state: dict[str, object],
 ) -> None:
     try:
-        values = _collect_form_values(fields)
+        values = await _read_form_values(form_key)
         create_cdp_connection(
             values.name,
             values.host,
@@ -104,14 +318,19 @@ def _create_connection(
         show_error(str(err))
         return
 
-    clear_form()
-    refresh_list()
+    state["show_create"] = False
+    refresh_index()
     show_success("CDP connection created")
 
 
-def _update_connection(connection_id: int, fields: dict[str, object], refresh_list: Callable[[], None]) -> None:
+async def _update_connection_from_form(
+    connection_id: int,
+    form_key: str,
+    refresh_index: Callable[[], None],
+    state: dict[str, object],
+) -> None:
     try:
-        values = _collect_form_values(fields)
+        values = await _read_form_values(form_key)
         updated = update_cdp_connection(
             connection_id,
             values.name,
@@ -129,148 +348,145 @@ def _update_connection(connection_id: int, fields: dict[str, object], refresh_li
         return
 
     if not updated:
+        state["editing_id"] = None
+        refresh_index()
         show_error("Connection no longer exists.")
-        refresh_list()
         return
 
-    refresh_list()
+    state["editing_id"] = None
+    refresh_index()
     show_success("CDP connection updated")
 
 
-def _delete_connection(connection_id: int, refresh_list: Callable[[], None]) -> None:
+def _delete_connection(connection_id: int, refresh_index: Callable[[], None], state: dict[str, object]) -> None:
     deleted = delete_cdp_connection(connection_id)
     if not deleted:
+        state["editing_id"] = None
+        refresh_index()
         show_error("Connection no longer exists.")
-        refresh_list()
         return
 
-    refresh_list()
+    if state["editing_id"] == connection_id:
+        state["editing_id"] = None
+
+    refresh_index()
     show_success("CDP connection deleted")
 
 
-def _render_form_fields(connection: CdpConnection | None = None) -> dict[str, object]:
-    with ui.column().classes("cdp-form-grid w-full"):
-        name = ui.input(value=connection.name if connection else "", placeholder="Connection name").classes("cdp-input")
-        name.props("outlined dense").classes("w-full").style("width: 100%")
+async def _read_form_values(form_key: str) -> ConnectionFormValues:
+    raw = await ui.run_javascript(
+        f"""(() => {{
+            const read = (id) => {{
+                const element = document.getElementById(id);
+                return element ? element.value : '';
+            }};
+            const readChecked = (id) => {{
+                const element = document.getElementById(id);
+                return Boolean(element && element.checked);
+            }};
+            return {{
+                name: read('{form_key}-name'),
+                host: read('{form_key}-host'),
+                port: read('{form_key}-port'),
+                browser: read('{form_key}-browser'),
+                wsPath: read('{form_key}-ws-path'),
+                username: read('{form_key}-username'),
+                password: read('{form_key}-password'),
+                notes: read('{form_key}-notes'),
+                isActive: readChecked('{form_key}-is-active'),
+            }};
+        }})()"""
+    )
 
-        host = ui.input(value=connection.host if connection else "", placeholder="127.0.0.1").classes("cdp-input")
-        host.props("outlined dense").classes("w-full").style("width: 100%")
+    payload = raw if isinstance(raw, dict) else {}
 
-        port = ui.number(value=connection.port if connection else 9222, min=1, max=65535).classes("cdp-input")
-        port.props("outlined dense").classes("w-full").style("width: 100%")
-
-        browser = ui.input(value=connection.browser if connection else "chrome", placeholder="chrome").classes("cdp-input")
-        browser.props("outlined dense").classes("w-full").style("width: 100%")
-
-        ws_path = ui.input(
-            value=connection.ws_path if connection else "/devtools/browser",
-            placeholder="/devtools/browser",
-        ).classes("cdp-input")
-        ws_path.props("outlined dense").classes("w-full").style("width: 100%")
-
-        username = ui.input(
-            value=connection.username or "" if connection else "",
-            placeholder="Username (optional)",
-        ).classes("cdp-input")
-        username.props("outlined dense").classes("w-full").style("width: 100%")
-
-        password = ui.input(
-            value=connection.password or "" if connection else "",
-            placeholder="Password (optional)",
-            password=True,
-        ).classes("cdp-input")
-        password.props("outlined dense").classes("w-full").style("width: 100%")
-
-        notes = ui.textarea(value=connection.notes or "" if connection else "", placeholder="Notes (optional)").classes(
-            "cdp-textarea w-full"
-        )
-        notes.props("outlined dense").style("width: 100%")
-
-        is_active = ui.switch("Active", value=connection.is_active if connection else True).classes("cdp-switch w-full")
-
-    return {
-        "name": name,
-        "host": host,
-        "port": port,
-        "browser": browser,
-        "ws_path": ws_path,
-        "username": username,
-        "password": password,
-        "notes": notes,
-        "is_active": is_active,
-    }
-
-
-def _collect_form_values(fields: dict[str, object]) -> ConnectionFormValues:
     return ConnectionFormValues(
-        name=_string_value(fields["name"]),
-        host=_string_value(fields["host"]),
-        port=_port_value(fields["port"]),
-        browser=_string_value(fields["browser"]),
-        ws_path=_string_value(fields["ws_path"]),
-        username=_optional_string_value(fields["username"]),
-        password=_optional_string_value(fields["password"]),
-        is_active=_bool_value(fields["is_active"]),
-        notes=_optional_string_value(fields["notes"]),
+        name=str(payload.get("name", "")).strip(),
+        host=str(payload.get("host", "")).strip(),
+        port=_parse_port(payload.get("port")),
+        browser=str(payload.get("browser", "")).strip(),
+        ws_path=str(payload.get("wsPath", "")).strip(),
+        username=_normalize_optional_text(payload.get("username")),
+        password=_normalize_optional_text(payload.get("password")),
+        is_active=bool(payload.get("isActive", False)),
+        notes=_normalize_optional_text(payload.get("notes")),
     )
 
 
-def _reset_form_fields(fields: dict[str, object]) -> None:
-    _set_component_value(fields["name"], "")
-    _set_component_value(fields["host"], "")
-    _set_component_value(fields["port"], 9222)
-    _set_component_value(fields["browser"], "chrome")
-    _set_component_value(fields["ws_path"], "/devtools/browser")
-    _set_component_value(fields["username"], "")
-    _set_component_value(fields["password"], "")
-    _set_component_value(fields["notes"], "")
-    _set_component_value(fields["is_active"], True)
+def _defaults_from_connection(connection: CdpConnection | None) -> ConnectionFormValues:
+    if connection is None:
+        return ConnectionFormValues(
+            name="",
+            host="",
+            port=9222,
+            browser="chrome",
+            ws_path="/devtools/browser",
+            username=None,
+            password=None,
+            is_active=True,
+            notes=None,
+        )
+
+    return ConnectionFormValues(
+        name=connection.name,
+        host=connection.host,
+        port=connection.port,
+        browser=connection.browser,
+        ws_path=connection.ws_path,
+        username=connection.username,
+        password=connection.password,
+        is_active=connection.is_active,
+        notes=connection.notes,
+    )
 
 
-def _string_value(component: object) -> str:
-    return str(_get_component_value(component) or "").strip()
+def _parse_port(raw_port: object) -> int:
+    as_text = str(raw_port or "").strip()
+    if as_text == "":
+        raise ValueError(PORT_PARSE_ERROR_MESSAGE)
+
+    try:
+        parsed_port = int(as_text)
+    except ValueError as exc:
+        raise ValueError(PORT_PARSE_ERROR_MESSAGE) from exc
+
+    return parsed_port
 
 
-def _optional_string_value(component: object) -> str | None:
-    normalized = _string_value(component)
+def _normalize_optional_text(value: object) -> str | None:
+    normalized = str(value or "").strip()
     if normalized == "":
         return None
     return normalized
 
 
-def _port_value(component: object) -> int:
-    raw_value = _get_component_value(component)
-    if raw_value is None:
-        raise ValueError(PORT_PARSE_ERROR_MESSAGE)
-
-    if isinstance(raw_value, bool):
-        raise ValueError(PORT_PARSE_ERROR_MESSAGE)
-
-    if isinstance(raw_value, int):
-        return raw_value
-
-    if isinstance(raw_value, float):
-        if raw_value.is_integer():
-            return int(raw_value)
-        raise ValueError(PORT_PARSE_ERROR_MESSAGE)
-
-    as_text = str(raw_value).strip()
-    if as_text == "":
-        raise ValueError(PORT_PARSE_ERROR_MESSAGE)
-
-    try:
-        return int(as_text)
-    except ValueError as exc:
-        raise ValueError(PORT_PARSE_ERROR_MESSAGE) from exc
+def _toggle_create_panel(state: dict[str, object], refresh_index: Callable[[], None]) -> None:
+    state["show_create"] = not bool(state["show_create"])
+    refresh_index()
 
 
-def _bool_value(component: object) -> bool:
-    return bool(_get_component_value(component))
+def _close_create_panel(state: dict[str, object], refresh_index: Callable[[], None]) -> None:
+    state["show_create"] = False
+    refresh_index()
 
 
-def _get_component_value(component: object) -> object:
-    return cast(object, getattr(component, "value", None))
+def _open_edit_panel(connection_id: int, state: dict[str, object], refresh_index: Callable[[], None]) -> None:
+    state["editing_id"] = connection_id
+    state["show_create"] = False
+    refresh_index()
 
 
-def _set_component_value(component: object, value: object) -> None:
-    setattr(component, "value", value)
+def _close_edit_panel(state: dict[str, object], refresh_index: Callable[[], None]) -> None:
+    state["editing_id"] = None
+    refresh_index()
+
+
+def _find_connection(connections: list[CdpConnection], raw_connection_id: object) -> CdpConnection | None:
+    if not isinstance(raw_connection_id, int):
+        return None
+
+    for connection in connections:
+        if connection.id == raw_connection_id:
+            return connection
+
+    return None

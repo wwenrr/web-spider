@@ -1,0 +1,125 @@
+.todo-crud-card {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.todo-create-row {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.todo-create-row .todo-input {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 0;
+}
+.todo-add-btn {
+  flex: 0 0 auto;
+  height: 40px;
+}
+
+.todo-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #FFFFFF;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.todo-row:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.todo-row-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px 0;
+  width: 100%;
+}
+.todo-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--color-text) !important;
+  line-height: 1.4 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.todo-id {
+  flex: 0 0 auto;
+  font-size: 12px !important;
+  color: var(--color-text-3) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.todo-row-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px 16px;
+  width: 100%;
+}
+.todo-row-body .todo-input {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 0;
+}
+
+.todo-btn-icon {
+  flex: 0 0 auto;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  border-radius: 8px !important;
+  color: var(--color-text-3) !important;
+  background: transparent !important;
+  transition: color 140ms ease, background 140ms ease !important;
+}
+.todo-btn-toggle:hover {
+  color: var(--color-accent-hover) !important;
+  background: rgba(64, 197, 124, 0.08) !important;
+}
+.todo-btn-delete {
+  opacity: 0.4;
+  transition: opacity 140ms ease, color 140ms ease, background 140ms ease !important;
+}
+.todo-row:hover .todo-btn-delete {
+  opacity: 1;
+}
+.todo-btn-delete:hover {
+  color: #C53030 !important;
+  background: rgba(197, 48, 48, 0.06) !important;
+  opacity: 1;
+}
+
+.todo-save-btn {
+  flex: 0 0 auto;
+  height: 34px !important;
+  padding: 4px 20px !important;
+  font-size: 13px !important;
+}
+
+.todo-empty {
+  font-size: 15px !important;
+  color: var(--color-text-2) !important;
+  padding: 32px 16px;
+  border: 1px dashed var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-alt);
+  text-align: center;
+}

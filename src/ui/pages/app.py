@@ -18,95 +18,97 @@ from ui.pages.dashboard import render_dashboard_section
 from ui.pages.monitor import _refresh_monitor_page, render_monitor_section
 from ui.pages.todos import render_todo_crud_section
 
-DEFAULT_VIEW = "todo"
+LEGACY_CDP_ROUTE = "/cdp-connections"
+DEFAULT_ROUTE = ROUTE_CDP_CONNECTIONS
 
 
 @dataclass(frozen=True)
-class ViewConfig:
+class PageConfig:
+    key: str
     title: str
     subtitle: str
 
 
-VIEW_CONFIGS = {
-    "dashboard": ViewConfig(title="Dashboard", subtitle="Overview of AI usage."),
-    "todo": ViewConfig(title="Todo CRUD", subtitle="Create, update, and manage todo items in one place."),
-    "cdp_connections": ViewConfig(
+PAGE_CONFIGS: dict[str, PageConfig] = {
+    "dashboard": PageConfig(
+        key="dashboard",
+        title="Dashboard",
+        subtitle="Overview of AI usage.",
+    ),
+    "todo": PageConfig(
+        key="todo",
+        title="Todo CRUD",
+        subtitle="Create, update, and manage todo items in one place.",
+    ),
+    "cdp_connections": PageConfig(
+        key="cdp_connections",
         title="CDP Connections",
         subtitle="Manage remote Chrome DevTools Protocol endpoints in one place.",
     ),
-    "monitor": ViewConfig(title="Job Monitor", subtitle="Monitor queue jobs and worker operations in one place."),
+    "monitor": PageConfig(
+        key="monitor",
+        title="Job Monitor",
+        subtitle="Monitor queue jobs and worker operations in one place.",
+    ),
+}
+
+VIEW_TO_ROUTE: dict[str, str] = {
+    "dashboard": ROUTE_DASHBOARD,
+    "todo": ROUTE_TODO,
+    "cdp_connections": DEFAULT_ROUTE,
+    "monitor": ROUTE_MONITOR,
 }
 
 
 def register_app_page() -> None:
     @ui.page(ROUTE_ROOT)
-    def app_page(request: Request) -> None:
-        ui.page_title(PAGE_TITLE)
-        state = {"view": _parse_view(request)}
-
-        @ui.refreshable
-        def render_app() -> None:
-            current_view = state["view"]
-            view_config = VIEW_CONFIGS[current_view]
-            body = build_page(
-                page=current_view,
-                title=view_config.title,
-                subtitle=view_config.subtitle,
-                on_navigate=lambda target: _change_view(target, state, render_app),
-            )
-            with body:
-                _render_view_content(current_view)
-
-        render_app()
-        ui.timer(5.0, lambda: _poll_monitor_if_needed(state["view"]))
+    def root_page(request: Request) -> RedirectResponse:
+        view = request.query_params.get("view", "").strip().lower()
+        if view in VIEW_TO_ROUTE:
+            return RedirectResponse(VIEW_TO_ROUTE[view])
+        return RedirectResponse(DEFAULT_ROUTE)
 
     @ui.page(ROUTE_DASHBOARD)
-    def dashboard_alias() -> RedirectResponse:
-        return RedirectResponse(f"{ROUTE_ROOT}?view=dashboard")
+    def dashboard_page() -> None:
+        _render_page(PAGE_CONFIGS["dashboard"])
 
     @ui.page(ROUTE_TODO)
-    def todo_alias() -> RedirectResponse:
-        return RedirectResponse(f"{ROUTE_ROOT}?view=todo")
+    def todo_page() -> None:
+        _render_page(PAGE_CONFIGS["todo"])
 
-    @ui.page(ROUTE_CDP_CONNECTIONS)
-    def cdp_connections_alias() -> RedirectResponse:
-        return RedirectResponse(f"{ROUTE_ROOT}?view=cdp_connections")
+    @ui.page(DEFAULT_ROUTE)
+    def cdp_connections_page() -> None:
+        _render_page(PAGE_CONFIGS["cdp_connections"])
+
+    @ui.page(LEGACY_CDP_ROUTE)
+    def cdp_connections_kebab_alias() -> RedirectResponse:
+        return RedirectResponse(DEFAULT_ROUTE)
 
     @ui.page(ROUTE_MONITOR)
-    def monitor_alias() -> RedirectResponse:
-        return RedirectResponse(f"{ROUTE_ROOT}?view=monitor")
+    def monitor_page() -> None:
+        _render_page(PAGE_CONFIGS["monitor"])
+        ui.timer(5.0, _refresh_monitor_page)
 
 
-def _change_view(target: str, state: dict[str, str], render_app: object) -> None:
-    if target not in VIEW_CONFIGS or state["view"] == target:
-        return
-    state["view"] = target
-    ui.run_javascript(f"window.history.pushState({{}}, '', '/?view={target}')")
-    refresh = getattr(render_app, "refresh", None)
-    if callable(refresh):
-        refresh()
+def _render_page(page_config: PageConfig) -> None:
+    ui.page_title(PAGE_TITLE)
+    body = build_page(
+        page=page_config.key,
+        title=page_config.title,
+        subtitle=page_config.subtitle,
+    )
+    with body:
+        _render_view_content(page_config.key)
 
 
-def _parse_view(request: Request) -> str:
-    requested = request.query_params.get("view", DEFAULT_VIEW).strip().lower()
-    if requested in VIEW_CONFIGS:
-        return requested
-    return DEFAULT_VIEW
-
-
-def _poll_monitor_if_needed(current_view: str) -> None:
-    if current_view == "monitor":
-        _refresh_monitor_page()
-
-
-def _render_view_content(current_view: str) -> None:
-    if current_view == "dashboard":
+def _render_view_content(page_key: str) -> None:
+    if page_key == "dashboard":
         render_dashboard_section()
         return
-    if current_view == "cdp_connections":
+    if page_key == "cdp_connections":
         render_cdp_connection_crud_section()
         return
-    if current_view == "monitor":
+    if page_key == "monitor":
         render_monitor_section()
         return
     render_todo_crud_section()

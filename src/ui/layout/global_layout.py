@@ -10,16 +10,16 @@ def build_shell(
     title: str,
     subtitle: str,
     on_navigate: Callable[[str], None] | None = None,
-) -> ui.column:
+) -> ui.element:
     with ui.element("div").classes("shell"):
         _render_sidebar(page, on_navigate=on_navigate)
         with ui.element("div").classes("content"):
             with ui.element("div").classes("content-inner"):
-                with ui.row().classes("page-hdr"):
-                    with ui.column().classes("gap-0"):
+                with ui.element("div").classes("page-hdr"):
+                    with ui.element("div").classes("page-hdr-text"):
                         ui.label(title).classes("page-title")
                         ui.label(subtitle).classes("page-sub")
-                body = ui.column().classes("page-body")
+                body = ui.element("div").classes("page-body")
     return body
 
 
@@ -30,7 +30,7 @@ def _render_sidebar(page: str, on_navigate: Callable[[str], None] | None = None)
                 f'<div class="nav-logo">{SIDEBAR_LOGO_HTML}</div>',
                 sanitize=False,
             )
-            with ui.column().classes("gap-0 nav-brand"):
+            with ui.element("div").classes("nav-brand"):
                 ui.label("Web Spider").classes("nav-brand-title")
                 ui.label("Automation Console").classes("nav-brand-sub")
 

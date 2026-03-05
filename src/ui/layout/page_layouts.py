@@ -10,5 +10,5 @@ def build_page(
     title: str,
     subtitle: str,
     on_navigate: Callable[[str], None] | None = None,
-) -> ui.column:
+) -> ui.element:
     return build_shell(page=page, title=title, subtitle=subtitle, on_navigate=on_navigate)

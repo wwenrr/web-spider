@@ -1,0 +1,45 @@
+/* Global Quasar reset-to-theme layer to avoid per-screen blue overrides. */
+.nicegui-content .bg-primary,
+.nicegui-content .text-bg-primary {
+  background: var(--color-accent) !important;
+}
+.nicegui-content .text-primary {
+  color: var(--color-accent-hover) !important;
+}
+.nicegui-content .q-toggle__inner--truthy {
+  color: var(--color-accent-hover) !important;
+}
+.nicegui-content .q-toggle__inner--truthy .q-toggle__track {
+  background: #CFEEDB !important;
+  opacity: 1 !important;
+}
+.nicegui-content .q-toggle__inner--truthy .q-toggle__thumb {
+  color: var(--color-accent-hover) !important;
+}
+
+.q-btn.btn-primary {
+  background: var(--color-accent) !important;
+  color: #FFFFFF !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+  padding: 12px 28px !important;
+}
+.q-btn.btn-primary:hover { background: var(--color-accent-hover) !important; }
+
+.cdp-crud-card .q-btn.cdp-submit-btn {
+  background: var(--color-accent) !important;
+}
+.cdp-crud-card .q-btn.cdp-submit-btn:hover {
+  background: var(--color-accent-hover) !important;
+}
+.cdp-crud-card .cdp-switch .q-toggle__inner--truthy {
+  color: var(--color-accent-hover) !important;
+}
+.cdp-crud-card .cdp-switch .q-toggle__inner--truthy .q-toggle__track {
+  background: #CFEEDB !important;
+  opacity: 1 !important;
+}
+.cdp-crud-card .cdp-switch .q-toggle__inner--truthy .q-toggle__thumb {
+  color: var(--color-accent-hover) !important;
+}

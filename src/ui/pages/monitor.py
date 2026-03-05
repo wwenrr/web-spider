@@ -58,13 +58,13 @@ def _render_monitor_overview(stats: QueueStats) -> None:
 
 
 def _render_monitor_jobs(queue_jobs: list[QueueJob]) -> None:
-    with ui.card().classes("card monitor-card").style("align-items: stretch;"):
+    with ui.card().classes("card monitor-card"):
         ui.label("Recent Jobs").classes("field-label")
         if not queue_jobs:
             ui.label("No queue jobs found in pybgworker DB.").classes("todo-empty")
             return
 
-        with ui.column().classes("monitor-job-list full-width").style("width: 100%; align-self: stretch;"):
+        with ui.element("div").classes("monitor-job-list"):
             for queue_job in queue_jobs:
                 _render_job_row(queue_job)
 
@@ -114,8 +114,8 @@ def _render_metric_card(title: str, value: str, detail: str) -> None:
 
 def _render_job_row(queue_job: QueueJob) -> None:
     status = queue_job.status.upper()
-    with ui.element("div").classes("monitor-job-row full-width").style("width: 100%;"):
-        with ui.column().classes("gap-0"):
+    with ui.element("div").classes("monitor-job-row"):
+        with ui.element("div").classes("monitor-job-info"):
             ui.label(queue_job.name).classes("todo-title")
             ui.label(f"Task {queue_job.id} • Attempt {queue_job.attempt}/{queue_job.max_retries}").classes("todo-id")
         ui.label(status).classes(_chip_class_for_status(queue_job.status))
@@ -159,6 +159,6 @@ def _chip_class_for_status(status: str) -> str:
 
 
 def _render_command_list(commands: Iterable[str]) -> None:
-    with ui.column().classes("monitor-command-list"):
+    with ui.element("div").classes("monitor-command-list"):
         for command in commands:
             ui.label(command).classes("monitor-command")

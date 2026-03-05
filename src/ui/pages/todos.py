@@ -31,7 +31,7 @@ def register_todos_page() -> None:
 def render_todo_crud_section() -> None:
     with ui.card().classes("card todo-crud-card"):
         ui.label("Create Todo").classes("field-label")
-        with ui.row().classes("todo-create-row"):
+        with ui.element("div").classes("todo-create-row"):
             create_field = ui.input(
                 placeholder="e.g. Review crawler output and publish report",
             ).classes("todo-input")
@@ -54,7 +54,7 @@ def render_todo_crud_section() -> None:
                 ui.label("No todo items yet. Add one above to get started.").classes("todo-empty")
                 return
 
-            with ui.column().classes("todo-list"):
+            with ui.element("div").classes("todo-list"):
                 for todo in todos:
                     _render_todo_row(todo, refresh_list=render_todo_list.refresh)
 
@@ -63,26 +63,29 @@ def render_todo_crud_section() -> None:
 
 def _render_todo_row(todo: Todo, refresh_list: Callable[[], None]) -> None:
     with ui.element("div").classes("todo-row"):
-        with ui.column().classes("gap-0 todo-title-block"):
+        with ui.element("div").classes("todo-row-header"):
+            render_status_badge(todo.is_done)
             ui.label(todo.title).classes("todo-title")
-            with ui.row().classes("todo-meta-row"):
-                render_status_badge(todo.is_done)
-                ui.label(f"ID #{todo.id}").classes("todo-id")
+            ui.label(f"#{todo.id}").classes("todo-id")
 
-        edit_field = ui.input(value=todo.title, placeholder="Update todo title").classes("todo-input")
-        edit_field.props("outlined dense")
+        with ui.element("div").classes("todo-row-body"):
+            edit_field = ui.input(value=todo.title, placeholder="Update title…").classes("todo-input")
+            edit_field.props("outlined dense")
 
-        with ui.row().classes("todo-actions-row"):
+            done_icon = "undo" if todo.is_done else "check"
+            done_tip = "Mark pending" if todo.is_done else "Mark done"
+            ui.button(
+                icon=done_icon,
+                on_click=lambda todo_id=todo.id: _toggle_todo(todo_id, refresh_list),
+            ).props("flat dense size=sm").classes("todo-btn-icon todo-btn-toggle").tooltip(done_tip)
             ui.button(
                 "Save",
                 on_click=lambda todo_id=todo.id: _update_todo(todo_id, edit_field.value, refresh_list),
-            ).props("unelevated no-caps size=sm").classes("btn-primary")
-            ui.button("Toggle", on_click=lambda todo_id=todo.id: _toggle_todo(todo_id, refresh_list)).props(
-                "outline no-caps size=sm"
-            )
-            ui.button("Delete", on_click=lambda todo_id=todo.id: _delete_todo(todo_id, refresh_list)).props(
-                "flat no-caps color=red-7 size=sm"
-            )
+            ).props("unelevated no-caps size=sm").classes("btn-primary todo-save-btn")
+            ui.button(
+                icon="close",
+                on_click=lambda todo_id=todo.id: _delete_todo(todo_id, refresh_list),
+            ).props("flat dense size=sm").classes("todo-btn-icon todo-btn-delete").tooltip("Delete")
 
 
 def _create_todo(raw_title: str | None, refresh_list: Callable[[], None], clear_input: Callable[[], None]) -> None:

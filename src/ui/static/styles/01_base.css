@@ -1,0 +1,27 @@
+* { box-sizing: border-box; }
+html,
+body {
+  height: 100%;
+  overflow: hidden !important;
+}
+body,
+.nicegui-content,
+.q-page-container,
+.q-page,
+main {
+  margin: 0;
+  background: #FCFDFE;
+  color: var(--color-text);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.6;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+.nicegui-content { overflow: hidden !important; }
+.nicegui-content,
+.q-layout,
+.q-page-container {
+  --q-primary: var(--color-accent-hover) !important;
+}
