@@ -121,7 +121,19 @@ a.nav-item {
   overflow: hidden;
   z-index: 1;
 }
+.nav-btn-reset {
+  width: calc(100% - 16px);
+  background: transparent;
+  border: 1px solid transparent;
+  text-align: left;
+  cursor: pointer;
+}
 a.nav-item:hover {
+  background: #FAFCFF;
+  color: var(--color-text) !important;
+  transform: translateX(2px);
+}
+.nav-btn-reset:hover {
   background: #FAFCFF;
   color: var(--color-text) !important;
   transform: translateX(2px);
@@ -135,6 +147,16 @@ a.nav-item.nav-item--on {
   transform: none;
 }
 a.nav-item.nav-item--on::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+.nav-btn-reset.nav-item--on::before {
   content: "";
   position: absolute;
   left: 12px;

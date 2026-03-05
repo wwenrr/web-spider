@@ -2,7 +2,8 @@ from pathlib import Path
 
 from nicegui import app, ui
 
-from domain.todos.services import TodoManager, configure_todo_manager
+from domain.todos.facade import configure_todo_manager
+from domain.todos.services import TodoManager
 from infrastructure.queues import get_default_job_queue
 from infrastructure.repositories.todo import get_todo_repository
 from ui.constants import FONT, PAGE_TITLE, build_favicon_head_html

@@ -1,11 +1,18 @@
+from collections.abc import Callable
+
 from nicegui import ui
 
 from ui.constants import ROUTE_DASHBOARD, ROUTE_MONITOR, ROUTE_TODO, SIDEBAR_LOGO_HTML
 
 
-def build_shell(page: str, title: str, subtitle: str) -> ui.column:
+def build_shell(
+    page: str,
+    title: str,
+    subtitle: str,
+    on_navigate: Callable[[str], None] | None = None,
+) -> ui.column:
     with ui.element("div").classes("shell"):
-        _render_sidebar(page)
+        _render_sidebar(page, on_navigate=on_navigate)
         with ui.element("div").classes("content"):
             with ui.element("div").classes("content-inner"):
                 with ui.row().classes("page-hdr"):
@@ -16,7 +23,7 @@ def build_shell(page: str, title: str, subtitle: str) -> ui.column:
     return body
 
 
-def _render_sidebar(page: str) -> None:
+def _render_sidebar(page: str, on_navigate: Callable[[str], None] | None = None) -> None:
     with ui.element("nav").classes("nav"):
         with ui.element("div").classes("nav-head"):
             ui.html(
@@ -27,18 +34,26 @@ def _render_sidebar(page: str) -> None:
                 ui.label("Web Spider").classes("nav-brand-title")
                 ui.label("Automation Console").classes("nav-brand-sub")
 
-        _render_link("Dashboard", "dashboard", ROUTE_DASHBOARD, page == "dashboard")
+        _render_link("Dashboard", "dashboard", ROUTE_DASHBOARD, "dashboard", page == "dashboard", on_navigate)
 
         ui.label("OPERATIONS").classes("nav-section")
-        _render_link("Todo CRUD", "checklist", ROUTE_TODO, page == "todo")
+        _render_link("Todo CRUD", "checklist", ROUTE_TODO, "todo", page == "todo", on_navigate)
 
         ui.label("MONITOR").classes("nav-section")
-        _render_link("Job Monitor", "monitor", ROUTE_MONITOR, page == "monitor")
+        _render_link("Job Monitor", "monitor", ROUTE_MONITOR, "monitor", page == "monitor", on_navigate)
 
         ui.element("div").classes("nav-grow")
 
 
-def _render_link(label: str, icon: str, href: str, active: bool, disabled: bool = False) -> None:
+def _render_link(
+    label: str,
+    icon: str,
+    href: str,
+    page_key: str,
+    active: bool,
+    on_navigate: Callable[[str], None] | None = None,
+    disabled: bool = False,
+) -> None:
     cls = "nav-item nav-item--on" if active else "nav-item"
     if disabled:
         with ui.element("div").classes(f"{cls} nav-item--disabled"):
@@ -46,6 +61,15 @@ def _render_link(label: str, icon: str, href: str, active: bool, disabled: bool 
                 ui.icon(icon).classes("nav-item-ic")
             ui.label(label).classes("nav-item-lbl")
             ui.label("Soon").classes("nav-item-tag")
+        return
+
+    if on_navigate is not None:
+        with ui.element("button").classes(f"{cls} nav-btn-reset").on(
+            "click", lambda _event=None, target=page_key: on_navigate(target)
+        ):
+            with ui.element("span").classes("nav-item-ic-wrap"):
+                ui.icon(icon).classes("nav-item-ic")
+            ui.label(label).classes("nav-item-lbl")
         return
 
     with ui.link(target=href).classes(cls):

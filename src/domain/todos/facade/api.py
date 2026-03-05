@@ -1,7 +1,8 @@
 from models.todo import Todo
 
+from domain.todos.services.todo_manager import TodoManager
+
 from .runtime import get_todo_manager
-from .todo_manager import TodoManager
 
 
 def create_todo(title: str) -> None:

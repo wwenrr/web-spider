@@ -1,7 +1,9 @@
+from collections.abc import Callable
+
 from fastapi.responses import RedirectResponse
 from nicegui import ui
 
-from domain.todos.services import create_todo, delete_todo, list_todos, toggle_todo, update_todo
+from domain.todos.facade import create_todo, delete_todo, list_todos, toggle_todo, update_todo
 from models.todo import Todo
 from ui.components.badges import render_status_badge
 from ui.constants import PAGE_TITLE, ROUTE_ROOT, ROUTE_TODO
@@ -34,21 +36,32 @@ def render_todo_crud_section() -> None:
                 placeholder="e.g. Review crawler output and publish report",
             ).classes("todo-input")
             create_field.props("outlined dense")
-            ui.button("Add Todo", on_click=lambda: _create_todo(create_field.value)).props(
+            ui.button(
+                "Add Todo",
+                on_click=lambda: _create_todo(
+                    create_field.value,
+                    refresh_list=render_todo_list.refresh,
+                    clear_input=lambda: setattr(create_field, "value", ""),
+                ),
+            ).props(
                 "unelevated no-caps size=sm"
             ).classes("btn-primary todo-add-btn")
 
-        todos = list_todos()
-        if not todos:
-            ui.label("No todo items yet. Add one above to get started.").classes("todo-empty")
-            return
+        @ui.refreshable
+        def render_todo_list() -> None:
+            todos = list_todos()
+            if not todos:
+                ui.label("No todo items yet. Add one above to get started.").classes("todo-empty")
+                return
 
-        with ui.column().classes("todo-list"):
-            for todo in todos:
-                _render_todo_row(todo)
+            with ui.column().classes("todo-list"):
+                for todo in todos:
+                    _render_todo_row(todo, refresh_list=render_todo_list.refresh)
+
+        render_todo_list()
 
 
-def _render_todo_row(todo: Todo) -> None:
+def _render_todo_row(todo: Todo, refresh_list: Callable[[], None]) -> None:
     with ui.element("div").classes("todo-row"):
         with ui.column().classes("gap-0 todo-title-block"):
             ui.label(todo.title).classes("todo-title")
@@ -62,17 +75,17 @@ def _render_todo_row(todo: Todo) -> None:
         with ui.row().classes("todo-actions-row"):
             ui.button(
                 "Save",
-                on_click=lambda todo_id=todo.id: _update_todo(todo_id, edit_field.value),
+                on_click=lambda todo_id=todo.id: _update_todo(todo_id, edit_field.value, refresh_list),
             ).props("unelevated no-caps size=sm").classes("btn-primary")
-            ui.button("Toggle", on_click=lambda todo_id=todo.id: _toggle_todo(todo_id)).props(
+            ui.button("Toggle", on_click=lambda todo_id=todo.id: _toggle_todo(todo_id, refresh_list)).props(
                 "outline no-caps size=sm"
             )
-            ui.button("Delete", on_click=lambda todo_id=todo.id: _delete_todo(todo_id)).props(
+            ui.button("Delete", on_click=lambda todo_id=todo.id: _delete_todo(todo_id, refresh_list)).props(
                 "flat no-caps color=red-7 size=sm"
             )
 
 
-def _create_todo(raw_title: str | None) -> None:
+def _create_todo(raw_title: str | None, refresh_list: Callable[[], None], clear_input: Callable[[], None]) -> None:
     title = (raw_title or "").strip()
     try:
         create_todo(title)
@@ -80,11 +93,12 @@ def _create_todo(raw_title: str | None) -> None:
         show_error(str(err))
         return
 
+    clear_input()
+    refresh_list()
     show_success("Todo created")
-    ui.navigate.reload()
 
 
-def _update_todo(todo_id: int, raw_title: str | None) -> None:
+def _update_todo(todo_id: int, raw_title: str | None, refresh_list: Callable[[], None]) -> None:
     title = (raw_title or "").strip()
     try:
         updated = update_todo(todo_id, title)
@@ -94,25 +108,25 @@ def _update_todo(todo_id: int, raw_title: str | None) -> None:
 
     if not updated:
         show_error("Todo no longer exists.")
-        ui.navigate.reload()
+        refresh_list()
         return
 
+    refresh_list()
     show_success("Todo updated")
-    ui.navigate.reload()
 
 
-def _toggle_todo(todo_id: int) -> None:
+def _toggle_todo(todo_id: int, refresh_list: Callable[[], None]) -> None:
     toggle_todo(todo_id)
+    refresh_list()
     show_success("Todo status updated")
-    ui.navigate.reload()
 
 
-def _delete_todo(todo_id: int) -> None:
+def _delete_todo(todo_id: int, refresh_list: Callable[[], None]) -> None:
     deleted = delete_todo(todo_id)
     if not deleted:
         show_error("Todo no longer exists.")
-        ui.navigate.reload()
+        refresh_list()
         return
 
+    refresh_list()
     show_success("Todo deleted")
-    ui.navigate.reload()

@@ -18,9 +18,14 @@ def register_monitor_page() -> None:
             subtitle="Monitor queue jobs and worker operations in one place.",
         )
         with body:
-            _render_monitor_live_sections()
-            _render_pybgworker_cli()
-            _render_observability_notes()
+            render_monitor_section()
+            ui.timer(5.0, _refresh_monitor_page)
+
+
+def render_monitor_section() -> None:
+    _render_monitor_live_sections()
+    _render_pybgworker_cli()
+    _render_observability_notes()
 
 
 def _render_monitor_live_sections() -> None:
@@ -34,7 +39,13 @@ def _render_monitor_live_sections() -> None:
 
     render_live_metrics()
     render_live_jobs()
-    ui.timer(5.0, lambda: (render_live_metrics.refresh(), render_live_jobs.refresh()))
+    _render_monitor_live_sections.refresh = lambda: (render_live_metrics.refresh(), render_live_jobs.refresh())
+
+
+def _refresh_monitor_page() -> None:
+    refresh = getattr(_render_monitor_live_sections, "refresh", None)
+    if callable(refresh):
+        refresh()
 
 
 def _render_monitor_overview(stats: QueueStats) -> None:

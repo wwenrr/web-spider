@@ -1,6 +1,4 @@
-from ui.pages.dashboard import register_dashboard_page
-from ui.pages.monitor import register_monitor_page
-from ui.pages.todos import register_todos_page
+from ui.pages.app import register_app_page
 
 _pages_registered = False
 
@@ -10,8 +8,6 @@ def register_pages() -> None:
     if _pages_registered:
         return
 
-    register_dashboard_page()
-    register_todos_page()
-    register_monitor_page()
+    register_app_page()
 
     _pages_registered = True

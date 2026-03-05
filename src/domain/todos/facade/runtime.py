@@ -1,4 +1,4 @@
-from .todo_manager import TodoManager
+from domain.todos.services.todo_manager import TodoManager
 
 _todo_manager: TodoManager | None = None
 
