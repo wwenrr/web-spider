@@ -16,15 +16,9 @@ from .colors import (
     TEXT_3,
 )
 from .routes import (
-    ROUTE_CRAWL,
-    ROUTE_CRAWL_PAGE,
     ROUTE_DASHBOARD,
-    ROUTE_JOB_CREATE,
-    ROUTE_JOB_DETAIL,
-    ROUTE_JOB_EDIT,
     ROUTE_ROOT,
-    route_job_detail,
-    route_job_edit,
+    ROUTE_TODO,
 )
 from .table_ids import TABLE_ID_JOBS
 
@@ -36,15 +30,9 @@ __all__ = [
     "BORDER",
     "FONT",
     "PAGE_TITLE",
-    "ROUTE_CRAWL",
-    "ROUTE_CRAWL_PAGE",
     "ROUTE_DASHBOARD",
-    "ROUTE_JOB_CREATE",
-    "ROUTE_JOB_DETAIL",
-    "ROUTE_JOB_EDIT",
     "ROUTE_ROOT",
-    "route_job_detail",
-    "route_job_edit",
+    "ROUTE_TODO",
     "SIDEBAR_LOGO_HTML",
     "SIDEBAR_W",
     "TABLE_ID_JOBS",
@@ -54,7 +42,8 @@ __all__ = [
     "build_favicon_head_html",
 ]
 
-_LOGO_PATH: Final[Path] = Path(__file__).resolve().parents[2] / "logo.png"
+_LOGO_PATH: Final[Path] = Path(__file__).resolve().parents[1] / "static" / "logo.png"
+STATIC_LOGO_URL: Final[str] = "/static/logo.png"
 
 FAVICON_DATA_URI: Final[str | None] = (
     f"data:image/png;base64,{base64.b64encode(_LOGO_PATH.read_bytes()).decode('ascii')}"
@@ -65,7 +54,7 @@ FAVICON_DATA_URI: Final[str | None] = (
 SIDEBAR_LOGO_HTML: Final[str]
 if _LOGO_PATH.exists():
     SIDEBAR_LOGO_HTML = (
-        f'<img src="data:image/png;base64,{base64.b64encode(_LOGO_PATH.read_bytes()).decode("ascii")}" '
+        f'<img src="{STATIC_LOGO_URL}" '
         'alt="Web Spider logo" width="88" height="88">'
     )
 else:

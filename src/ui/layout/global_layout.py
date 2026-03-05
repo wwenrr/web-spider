@@ -1,6 +1,6 @@
 from nicegui import ui
 
-from ui.constants import ROUTE_CRAWL, ROUTE_DASHBOARD, ROUTE_JOB_CREATE, SIDEBAR_LOGO_HTML
+from ui.constants import ROUTE_DASHBOARD, ROUTE_TODO, SIDEBAR_LOGO_HTML
 
 
 def build_shell(page: str, title: str, subtitle: str) -> ui.column:
@@ -30,8 +30,7 @@ def _render_sidebar(page: str) -> None:
         _render_link("Dashboard", "dashboard", ROUTE_DASHBOARD, page == "dashboard")
 
         ui.label("OPERATIONS").classes("nav-section")
-        _render_link("AI API Token", "key", ROUTE_JOB_CREATE, page == "create")
-        _render_link("Crawl Settings", "webhook", ROUTE_CRAWL, page == "crawl")
+        _render_link("Todo CRUD", "checklist", ROUTE_TODO, page == "todo")
 
         ui.label("INTEGRATIONS").classes("nav-section")
         _render_link("WordPress", "language", ROUTE_DASHBOARD, False, disabled=True)

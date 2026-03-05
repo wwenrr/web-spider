@@ -33,3 +33,6 @@
 ## Function Ordering Rule
 - Place helper functions below the main function that calls them.
 - Example: if function `a()` calls function `b()`, then define `b()` below `a()`.
+
+## Verification Rule
+- After any code or configuration change, always run `poetry run lint` to verify before reporting completion.
