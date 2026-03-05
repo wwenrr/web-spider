@@ -6,5 +6,5 @@ DEFAULT_WORKER_APP_NAME: Final[str] = "tasks"
 TASK_LOG_TODO_CREATED: Final[str] = AUDIT_EVENT_JOB_CREATED
 
 TASK_IMPORT_PATHS: Final[dict[str, str]] = {
-    TASK_LOG_TODO_CREATED: "tasks.log_todo_created",
+    TASK_LOG_TODO_CREATED: "infrastructure.jobs.todo_jobs.log_todo_created",
 }
