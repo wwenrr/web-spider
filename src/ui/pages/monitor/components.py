@@ -2,7 +2,7 @@ from collections.abc import Iterable
 
 from nicegui import ui
 
-from domain.monitoring.models import QueueJob
+from core.monitoring.models import QueueJob
 from ui.pages.monitor.formatters import chip_class_for_status, format_job_time
 
 

@@ -4,7 +4,7 @@ from html import escape
 
 from nicegui import ui
 
-from models.cdp_connection import CdpConnection
+from infrastructure.models.cdp_connection import CdpConnection
 from ui.pages.cdp_connections.form_values import defaults_from_connection
 
 

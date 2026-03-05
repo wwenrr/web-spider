@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 from nicegui import ui
 
-from models.todo import Todo
+from infrastructure.models.todo import Todo
 from ui.components.badges import render_status_badge
 from ui.pages.todos.actions import handle_delete_todo, handle_toggle_todo, handle_update_todo
 

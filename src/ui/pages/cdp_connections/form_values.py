@@ -3,7 +3,7 @@ from typing import Final
 
 from nicegui import ui
 
-from models.cdp_connection import CdpConnection
+from infrastructure.models.cdp_connection import CdpConnection
 
 PORT_PARSE_ERROR_MESSAGE: Final[str] = "Port phải là số nguyên hợp lệ"
 

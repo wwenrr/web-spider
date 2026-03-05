@@ -1,7 +1,7 @@
 from collections.abc import Callable
 
-from domain.cdp_connections.facade import create_cdp_connection, delete_cdp_connection, update_cdp_connection
-from models.cdp_connection import CdpConnection
+from core.cdp_connections.facade import create_cdp_connection, delete_cdp_connection, update_cdp_connection
+from infrastructure.models.cdp_connection import CdpConnection
 from ui.helpers import show_error, show_success
 from ui.pages.cdp_connections.form_values import read_form_values
 

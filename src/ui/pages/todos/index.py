@@ -1,7 +1,7 @@
 from fastapi.responses import RedirectResponse
 from nicegui import ui
 
-from domain.todos.facade import list_todos
+from core.todos.facade import list_todos
 from ui.constants import PAGE_TITLE, ROUTE_ROOT, ROUTE_TODO
 from ui.layout import build_page
 from ui.pages.todos.actions import handle_create_todo

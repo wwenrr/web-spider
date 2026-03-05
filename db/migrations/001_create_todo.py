@@ -2,7 +2,7 @@ from typing import Any, Final
 
 from peewee_migrate import Migrator
 
-from models.todo import Todo
+from infrastructure.models.todo import Todo
 
 
 TODO_TABLE_NAME: Final[str] = "todo"

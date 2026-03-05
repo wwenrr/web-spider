@@ -4,7 +4,7 @@ from typing import Final, cast
 from peewee import DoesNotExist
 
 from infrastructure.database import database
-from models.todo import Todo, utc_now
+from infrastructure.models.todo import Todo, utc_now
 
 EMPTY_TITLE_MESSAGE: Final[str] = "Nội dung không được để trống"
 

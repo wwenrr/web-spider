@@ -1,4 +1,4 @@
-from domain.monitoring.models import QueueJob, QueueStats
+from core.monitoring.models import QueueJob, QueueStats
 from infrastructure.queues.monitoring import (
     QueueJob as InfraQueueJob,
 )

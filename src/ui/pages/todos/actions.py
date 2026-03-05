@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-from domain.todos.facade import create_todo, delete_todo, toggle_todo, update_todo
+from core.todos.facade import create_todo, delete_todo, toggle_todo, update_todo
 from ui.helpers import show_error, show_success
 
 

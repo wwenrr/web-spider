@@ -2,8 +2,8 @@ from collections.abc import Callable
 
 from nicegui import ui
 
-from domain.monitoring.facade import get_queue_stats, list_queue_jobs
-from domain.monitoring.models import QueueJob, QueueStats
+from core.monitoring.facade import get_queue_stats, list_queue_jobs
+from core.monitoring.models import QueueJob, QueueStats
 from ui.pages.monitor.components import render_command_list, render_job_row, render_metric_card
 
 _refresh_callback: Callable[[], None] | None = None

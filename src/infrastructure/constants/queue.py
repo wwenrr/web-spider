@@ -1,6 +1,6 @@
 from typing import Final
 
-from domain.todos.constants import AUDIT_EVENT_JOB_CREATED
+from core.todos.constants import AUDIT_EVENT_JOB_CREATED
 
 DEFAULT_WORKER_APP_NAME: Final[str] = "tasks"
 TASK_LOG_TODO_CREATED: Final[str] = AUDIT_EVENT_JOB_CREATED

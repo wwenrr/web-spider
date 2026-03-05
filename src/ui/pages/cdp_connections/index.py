@@ -1,4 +1,4 @@
-from domain.cdp_connections.facade import list_cdp_connections
+from core.cdp_connections.facade import list_cdp_connections
 from nicegui import ui
 
 from ui.pages.cdp_connections.handlers import (

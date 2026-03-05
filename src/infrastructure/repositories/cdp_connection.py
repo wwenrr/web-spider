@@ -1,7 +1,7 @@
 from typing import Final, cast
 
 from infrastructure.database import database
-from models.cdp_connection import CdpConnection, utc_now
+from infrastructure.models.cdp_connection import CdpConnection, utc_now
 
 EMPTY_NAME_MESSAGE: Final[str] = "Tên connection không được để trống"
 EMPTY_HOST_MESSAGE: Final[str] = "Host không được để trống"

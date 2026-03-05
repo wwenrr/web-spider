@@ -2,12 +2,12 @@ from pathlib import Path
 
 from nicegui import app, ui
 
-from domain.cdp_connections.facade import configure_cdp_connection_manager
-from domain.cdp_connections.services import CdpConnectionManager
-from domain.monitoring.facade import configure_queue_monitoring_manager
-from domain.monitoring.services import QueueMonitoringManager
-from domain.todos.facade import configure_todo_manager
-from domain.todos.services import TodoManager
+from core.cdp_connections.facade import configure_cdp_connection_manager
+from core.cdp_connections.services import CdpConnectionManager
+from core.monitoring.facade import configure_queue_monitoring_manager
+from core.monitoring.services import QueueMonitoringManager
+from core.todos.facade import configure_todo_manager
+from core.todos.services import TodoManager
 from infrastructure.queues import get_default_job_queue
 from infrastructure.repositories.cdp_connection import get_cdp_connection_repository
 from infrastructure.repositories.queue_monitoring import get_queue_monitoring_repository

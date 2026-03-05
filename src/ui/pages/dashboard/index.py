@@ -1,4 +1,4 @@
-from domain.todos.facade import list_todos
+from core.todos.facade import list_todos
 from nicegui import ui
 
 

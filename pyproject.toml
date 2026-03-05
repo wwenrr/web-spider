@@ -5,13 +5,10 @@ description = ""
 authors = ["MK <qscvdefb@gmail.com>"]
 readme = "README.md"
 packages = [
-    { include = "adapters", from = "src" },
-    { include = "domain", from = "src" },
+    { include = "core", from = "src" },
     { include = "infrastructure", from = "src" },
-    { include = "models", from = "src" },
-    { include = "tooling", from = "src" },
-    { include = "ui", from = "src" },
-    { include = "utils", from = "src" }
+    { include = "tooling", from = "." },
+    { include = "ui", from = "src" }
 ]
 
 [tool.poetry.dependencies]
@@ -46,6 +43,6 @@ dev = [
 
 [tool.mypy]
 python_version = "3.12"
-packages = ["adapters", "domain", "infrastructure", "models", "tooling", "ui", "utils"]
+packages = ["core", "infrastructure", "tooling", "ui"]
 strict = true
 ignore_missing_imports = true
