@@ -4,6 +4,15 @@
  * and spacing so that only the app's custom design tokens apply.
  */
 
+/* ── Global anchor reset: no underline decoration ─────────────── */
+a,
+a:hover,
+a:focus,
+a:active,
+a:visited {
+  text-decoration: none !important;
+}
+
 /* ── Box-model reset ──────────────────────────────────────────── */
 *,
 *::before,

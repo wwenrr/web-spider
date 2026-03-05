@@ -1,0 +1,117 @@
+.spy-root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.spy-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.spy-tab-btn {
+  border: 1px solid var(--color-border);
+  background: #FFFFFF;
+  color: var(--color-text-2);
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.spy-tab-btn,
+.spy-tab-btn:visited,
+.spy-tab-btn:hover,
+.spy-tab-btn:focus,
+.spy-tab-btn:active,
+.spy-tab-btn *,
+.spy-tab-btn *:visited,
+.spy-tab-btn *:hover,
+.spy-tab-btn *:focus,
+.spy-tab-btn *:active {
+  text-decoration: none !important;
+}
+.spy-tab-btn:hover {
+  border-color: #CFEEDB;
+  color: var(--color-text);
+  text-decoration: none;
+}
+.spy-tab-btn--active {
+  border-color: transparent;
+  background: var(--color-accent-bg);
+  color: var(--color-accent-hover);
+}
+.spy-tab-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.spy-tab-label {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: inherit !important;
+}
+.spy-categories {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.spy-cat-card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #FFFFFF;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.spy-cat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.spy-cat-title {
+  margin: 0;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: var(--color-text) !important;
+}
+.spy-cat-count {
+  font-size: 12px !important;
+  color: var(--color-text-3) !important;
+}
+.spy-sub-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.spy-sub-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #EEF3F8;
+  border-radius: 8px;
+  background: #FCFDFE;
+}
+.spy-sub-link {
+  color: var(--color-text);
+  text-decoration: none;
+}
+.spy-sub-link:hover {
+  color: var(--color-accent-hover);
+}
+.spy-sub-label {
+  font-size: 14px !important;
+  color: inherit !important;
+}
+.spy-sub-href {
+  font-size: 11px !important;
+  color: var(--color-text-3) !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

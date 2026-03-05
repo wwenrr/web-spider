@@ -1,4 +1,4 @@
-from ui.pages.app import register_app_page
+from ui.pages.app.index import register_app_page
 
 _pages_registered = False
 

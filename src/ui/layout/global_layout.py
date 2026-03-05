@@ -2,7 +2,14 @@ from collections.abc import Callable
 
 from nicegui import ui
 
-from ui.constants import ROUTE_CDP_CONNECTIONS, ROUTE_DASHBOARD, ROUTE_MONITOR, ROUTE_TODO, SIDEBAR_LOGO_HTML
+from ui.constants import (
+    ROUTE_CDP_CONNECTIONS,
+    ROUTE_DASHBOARD,
+    ROUTE_MONITOR,
+    ROUTE_SPY_1999,
+    ROUTE_TODO,
+    SIDEBAR_LOGO_HTML,
+)
 
 
 def build_shell(
@@ -35,6 +42,9 @@ def _render_sidebar(page: str, on_navigate: Callable[[str], None] | None = None)
                 ui.label("Automation Console").classes("nav-brand-sub")
 
         _render_link("Dashboard", "dashboard", ROUTE_DASHBOARD, "dashboard", page == "dashboard", on_navigate)
+
+        ui.label("SPY").classes("nav-section")
+        _render_link("1999.co.jp", "travel_explore", ROUTE_SPY_1999, "spy_1999", page == "spy_1999", on_navigate)
 
         ui.label("OPERATIONS").classes("nav-section")
         _render_link("Todo CRUD", "checklist", ROUTE_TODO, "todo", page == "todo", on_navigate)

@@ -10,6 +10,7 @@ _STYLE_ORDER: Final[tuple[str, ...]] = (
     "10_layout.css",
     "20_todo.css",
     "30_cdp.css",
+    "35_spy.css",
     "40_monitor.css",
     "50_components.css",
     "90_responsive.css",

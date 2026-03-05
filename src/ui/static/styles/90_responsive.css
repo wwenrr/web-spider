@@ -28,6 +28,9 @@
     flex: 1 1 100%;
   }
   .cdp-actions-row { justify-content: flex-start; flex-wrap: wrap; }
+  .spy-categories {
+    grid-template-columns: 1fr;
+  }
   .monitor-metrics {
     grid-template-columns: 1fr;
     gap: 12px;

@@ -134,7 +134,7 @@ secrets.toml
 config.toml
 
 # Data & DB
-data/
+db/data/
 *.db
 *.db-journal
 pybgworker.db

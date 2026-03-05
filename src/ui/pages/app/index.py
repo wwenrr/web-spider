@@ -5,18 +5,15 @@ from fastapi.responses import RedirectResponse
 from nicegui import ui
 
 from ui.constants import (
-    PAGE_TITLE,
     ROUTE_CDP_CONNECTIONS,
     ROUTE_DASHBOARD,
     ROUTE_MONITOR,
     ROUTE_ROOT,
+    ROUTE_SPY_1999,
     ROUTE_TODO,
 )
-from ui.layout import build_page
-from ui.pages.cdp_connections import render_cdp_connection_crud_section
-from ui.pages.dashboard import render_dashboard_section
-from ui.pages.monitor import _refresh_monitor_page, render_monitor_section
-from ui.pages.todos import render_todo_crud_section
+from ui.pages.app.renderers import render_spy_page, render_standard_page
+from ui.pages.monitor.index import _refresh_monitor_page
 
 LEGACY_CDP_ROUTE = "/cdp-connections"
 DEFAULT_ROUTE = ROUTE_CDP_CONNECTIONS
@@ -50,6 +47,11 @@ PAGE_CONFIGS: dict[str, PageConfig] = {
         title="Job Monitor",
         subtitle="Monitor queue jobs and worker operations in one place.",
     ),
+    "spy_1999": PageConfig(
+        key="spy_1999",
+        title="Spy 1999.co.jp",
+        subtitle="Render discovered category and ranking links for crawl preparation.",
+    ),
 }
 
 VIEW_TO_ROUTE: dict[str, str] = {
@@ -57,6 +59,7 @@ VIEW_TO_ROUTE: dict[str, str] = {
     "todo": ROUTE_TODO,
     "cdp_connections": DEFAULT_ROUTE,
     "monitor": ROUTE_MONITOR,
+    "spy_1999": ROUTE_SPY_1999,
 }
 
 
@@ -70,15 +73,18 @@ def register_app_page() -> None:
 
     @ui.page(ROUTE_DASHBOARD)
     def dashboard_page() -> None:
-        _render_page(PAGE_CONFIGS["dashboard"])
+        config = PAGE_CONFIGS["dashboard"]
+        render_standard_page(config.key, config.title, config.subtitle)
 
     @ui.page(ROUTE_TODO)
     def todo_page() -> None:
-        _render_page(PAGE_CONFIGS["todo"])
+        config = PAGE_CONFIGS["todo"]
+        render_standard_page(config.key, config.title, config.subtitle)
 
     @ui.page(DEFAULT_ROUTE)
     def cdp_connections_page() -> None:
-        _render_page(PAGE_CONFIGS["cdp_connections"])
+        config = PAGE_CONFIGS["cdp_connections"]
+        render_standard_page(config.key, config.title, config.subtitle)
 
     @ui.page(LEGACY_CDP_ROUTE)
     def cdp_connections_kebab_alias() -> RedirectResponse:
@@ -86,29 +92,13 @@ def register_app_page() -> None:
 
     @ui.page(ROUTE_MONITOR)
     def monitor_page() -> None:
-        _render_page(PAGE_CONFIGS["monitor"])
+        config = PAGE_CONFIGS["monitor"]
+        render_standard_page(config.key, config.title, config.subtitle)
         ui.timer(5.0, _refresh_monitor_page)
 
-
-def _render_page(page_config: PageConfig) -> None:
-    ui.page_title(PAGE_TITLE)
-    body = build_page(
-        page=page_config.key,
-        title=page_config.title,
-        subtitle=page_config.subtitle,
-    )
-    with body:
-        _render_view_content(page_config.key)
-
-
-def _render_view_content(page_key: str) -> None:
-    if page_key == "dashboard":
-        render_dashboard_section()
-        return
-    if page_key == "cdp_connections":
-        render_cdp_connection_crud_section()
-        return
-    if page_key == "monitor":
-        render_monitor_section()
-        return
-    render_todo_crud_section()
+    @ui.page(ROUTE_SPY_1999)
+    def spy_1999_page(request: Request) -> None:
+        tab = request.query_params.get("tab", "").strip().lower()
+        active_tab = tab if tab in {"categories", "rankings"} else "categories"
+        config = PAGE_CONFIGS["spy_1999"]
+        render_spy_page(config.key, config.title, config.subtitle, active_tab)
