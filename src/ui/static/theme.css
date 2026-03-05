@@ -1,0 +1,12 @@
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --color-accent: #40C57C;
+  --color-accent-hover: #36B06C;
+  --color-accent-bg: #F6FCF8;
+  --color-text: #2F3D4F;
+  --color-text-2: #7E8DA1;
+  --color-text-3: #AAB6C5;
+  --color-border: #E6ECF3;
+  --color-bg-alt: #FBFCFE;
+  --sidebar-width: 288px;
+}

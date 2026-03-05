@@ -1,0 +1,42 @@
+[importlinter]
+root_packages =
+    adapters
+    domain
+    infrastructure
+    models
+    tooling
+    ui
+    utils
+include_external_packages = True
+
+[importlinter:contract:ui_does_not_import_infrastructure]
+name = UI must not import infrastructure directly
+type = forbidden
+source_modules =
+    ui
+forbidden_modules =
+    infrastructure
+allow_indirect_imports = True
+
+[importlinter:contract:domain_does_not_import_ui]
+name = Domain must not import UI
+type = forbidden
+source_modules =
+    domain
+forbidden_modules =
+    ui
+
+[importlinter:contract:adapters_do_not_import_ui_or_domain]
+name = Adapters must not import UI or Domain
+type = forbidden
+source_modules =
+    adapters
+forbidden_modules =
+    ui
+    domain
+
+[importlinter:contract:utils_independent]
+name = Utils should be independent
+type = independence
+modules =
+    utils

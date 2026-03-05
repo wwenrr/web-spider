@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "n8n-nicegui"
+version = "0.1.0"
+description = ""
+authors = ["MK <qscvdefb@gmail.com>"]
+readme = "README.md"
+packages = [
+    { include = "adapters", from = "src" },
+    { include = "domain", from = "src" },
+    { include = "infrastructure", from = "src" },
+    { include = "models", from = "src" },
+    { include = "tooling", from = "src" },
+    { include = "ui", from = "src" },
+    { include = "utils", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+peewee = ">=3.17.0,<4.0.0"
+peewee-migrate = ">=1.14.3,<2.0.0"
+sqlite-utils = "^3.38.0"
+sqliteschema = "^2.0.1"
+SimpleSQLite = "^1.5.4"
+pytablewriter = "^1.2.1"
+PyYAML = "^6.0.2"
+pybgworker = "^0.3.0"
+nicegui = "^3.7.1"
+
+[tool.poetry.scripts]
+start = "entry:run"
+bgworker = "tasks:run_worker"
+migration = "infrastructure.helpers.migration_helpers:run_migrations"
+migrate = "infrastructure.helpers.migration_helpers:run_migrations"
+lint = "tooling.lint:run"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "mypy (>=1.19.1,<2.0.0)",
+    "playwright (>=1.58.0,<2.0.0)",
+    "import-linter (>=2.10,<3.0)"
+]
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["adapters", "domain", "infrastructure", "models", "tooling", "ui", "utils"]
+strict = true
+ignore_missing_imports = true

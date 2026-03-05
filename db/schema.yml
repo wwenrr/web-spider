@@ -1,0 +1,19 @@
+migratehistory:
+- Field: id
+  Type: INTEGER
+- Field: name
+  Type: VARCHAR(255)
+- Field: migrated_at
+  Type: DATETIME
+
+todo:
+- Field: id
+  Type: INTEGER
+- Field: title
+  Type: VARCHAR(255)
+- Field: is_done
+  Type: INTEGER
+- Field: created_at
+  Type: DATETIME
+- Field: updated_at
+  Type: DATETIME
