@@ -333,6 +333,97 @@ a.nav-item.nav-item--on .nav-item-ic-wrap {
   background: var(--color-bg-alt);
 }
 
+.monitor-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.monitor-metrics {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.monitor-metric-card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 18px 16px;
+  background: #FFFFFF;
+}
+.monitor-metric-title {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-3) !important;
+}
+.monitor-metric-value {
+  margin-top: 8px;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: var(--color-text) !important;
+  line-height: 1.2 !important;
+}
+.monitor-metric-detail {
+  margin-top: 6px;
+  font-size: 13px !important;
+  color: var(--color-text-2) !important;
+  line-height: 1.5;
+}
+
+.monitor-note {
+  font-size: 15px !important;
+  margin-top: 0;
+}
+.monitor-subhead {
+  margin-top: 8px;
+}
+.monitor-command-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.monitor-command {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: #F8FAFC;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px !important;
+  color: #1F2937 !important;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.monitor-card .monitor-job-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  align-self: stretch !important;
+  flex: 1 1 auto;
+}
+.monitor-card .monitor-job-row {
+  width: 100%;
+  min-width: 100%;
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: #FFFFFF;
+}
+.monitor-job-time {
+  font-size: 12px !important;
+  color: var(--color-text-3) !important;
+  text-align: right;
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
@@ -350,6 +441,14 @@ a.nav-item.nav-item--on .nav-item-ic-wrap {
 .chip--amber {
   background: #FEF9E8;
   color: #8A6D14;
+}
+.chip--red {
+  background: #FDECEC;
+  color: #9F2D2D;
+}
+.chip--blue {
+  background: #EAF3FF;
+  color: #2B5C98;
 }
 
 .q-btn.btn-primary {
@@ -417,6 +516,19 @@ a.nav-item.nav-item--on .nav-item-ic-wrap {
     gap: 12px;
   }
   .todo-actions-row { justify-content: flex-start; }
+  .monitor-metrics {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .monitor-job-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .monitor-job-time { text-align: left; }
+  .monitor-command {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
   .shell {
     flex-direction: column;
     height: auto !important;

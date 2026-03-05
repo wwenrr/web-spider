@@ -17,6 +17,7 @@ from .colors import (
 )
 from .routes import (
     ROUTE_DASHBOARD,
+    ROUTE_MONITOR,
     ROUTE_ROOT,
     ROUTE_TODO,
 )
@@ -31,6 +32,7 @@ __all__ = [
     "FONT",
     "PAGE_TITLE",
     "ROUTE_DASHBOARD",
+    "ROUTE_MONITOR",
     "ROUTE_ROOT",
     "ROUTE_TODO",
     "SIDEBAR_LOGO_HTML",

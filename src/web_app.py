@@ -2,17 +2,17 @@ from pathlib import Path
 
 from nicegui import app, ui
 
-from domain.jobs.services import JobManager, configure_job_manager
-from infrastructure.repositories.todo import get_job_repository
+from domain.todos.services import TodoManager, configure_todo_manager
+from infrastructure.repositories.todo import get_todo_repository
 from ui.constants import FONT, PAGE_TITLE, build_favicon_head_html
 from ui.pages import register_pages
 from ui.static import build_css
 
 
 def run_app() -> None:
-    configure_job_manager(
-        JobManager(
-            repository=get_job_repository(),
+    configure_todo_manager(
+        TodoManager(
+            repository=get_todo_repository(),
         )
     )
     register_pages()

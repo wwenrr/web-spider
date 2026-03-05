@@ -1,6 +1,6 @@
 from nicegui import ui
 
-from ui.constants import ROUTE_DASHBOARD, ROUTE_TODO, SIDEBAR_LOGO_HTML
+from ui.constants import ROUTE_DASHBOARD, ROUTE_MONITOR, ROUTE_TODO, SIDEBAR_LOGO_HTML
 
 
 def build_shell(page: str, title: str, subtitle: str) -> ui.column:
@@ -31,6 +31,9 @@ def _render_sidebar(page: str) -> None:
 
         ui.label("OPERATIONS").classes("nav-section")
         _render_link("Todo CRUD", "checklist", ROUTE_TODO, page == "todo")
+
+        ui.label("MONITOR").classes("nav-section")
+        _render_link("Job Monitor", "monitor", ROUTE_MONITOR, page == "monitor")
 
         ui.label("INTEGRATIONS").classes("nav-section")
         _render_link("WordPress", "language", ROUTE_DASHBOARD, False, disabled=True)

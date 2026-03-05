@@ -1,7 +1,7 @@
 from fastapi.responses import RedirectResponse
 from nicegui import ui
 
-from domain.jobs.services import create_job, delete_job, list_jobs, toggle_job, update_job
+from domain.todos.services import create_todo, delete_todo, list_todos, toggle_todo, update_todo
 from models.todo import Todo
 from ui.components.badges import render_status_badge
 from ui.constants import PAGE_TITLE, ROUTE_ROOT, ROUTE_TODO
@@ -38,7 +38,7 @@ def render_todo_crud_section() -> None:
                 "unelevated no-caps size=sm"
             ).classes("btn-primary todo-add-btn")
 
-        todos = list_jobs()
+        todos = list_todos()
         if not todos:
             ui.label("No todo items yet. Add one above to get started.").classes("todo-empty")
             return
@@ -75,7 +75,7 @@ def _render_todo_row(todo: Todo) -> None:
 def _create_todo(raw_title: str | None) -> None:
     title = (raw_title or "").strip()
     try:
-        create_job(title)
+        create_todo(title)
     except ValueError as err:
         show_error(str(err))
         return
@@ -87,7 +87,7 @@ def _create_todo(raw_title: str | None) -> None:
 def _update_todo(todo_id: int, raw_title: str | None) -> None:
     title = (raw_title or "").strip()
     try:
-        updated = update_job(todo_id, title)
+        updated = update_todo(todo_id, title)
     except ValueError as err:
         show_error(str(err))
         return
@@ -102,13 +102,13 @@ def _update_todo(todo_id: int, raw_title: str | None) -> None:
 
 
 def _toggle_todo(todo_id: int) -> None:
-    toggle_job(todo_id)
+    toggle_todo(todo_id)
     show_success("Todo status updated")
     ui.navigate.reload()
 
 
 def _delete_todo(todo_id: int) -> None:
-    deleted = delete_job(todo_id)
+    deleted = delete_todo(todo_id)
     if not deleted:
         show_error("Todo no longer exists.")
         ui.navigate.reload()
