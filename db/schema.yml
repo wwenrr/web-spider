@@ -17,3 +17,29 @@ todo:
   Type: DATETIME
 - Field: updated_at
   Type: DATETIME
+
+cdp_connection:
+- Field: id
+  Type: INTEGER
+- Field: name
+  Type: VARCHAR(120)
+- Field: host
+  Type: VARCHAR(255)
+- Field: port
+  Type: INTEGER
+- Field: browser
+  Type: VARCHAR(32)
+- Field: ws_path
+  Type: VARCHAR(255)
+- Field: username
+  Type: VARCHAR(255)
+- Field: password
+  Type: VARCHAR(255)
+- Field: is_active
+  Type: INTEGER
+- Field: notes
+  Type: TEXT
+- Field: created_at
+  Type: DATETIME
+- Field: updated_at
+  Type: DATETIME

@@ -2,9 +2,15 @@ from pathlib import Path
 
 from nicegui import app, ui
 
+from domain.cdp_connections.facade import configure_cdp_connection_manager
+from domain.cdp_connections.services import CdpConnectionManager
+from domain.monitoring.facade import configure_queue_monitoring_manager
+from domain.monitoring.services import QueueMonitoringManager
 from domain.todos.facade import configure_todo_manager
 from domain.todos.services import TodoManager
 from infrastructure.queues import get_default_job_queue
+from infrastructure.repositories.cdp_connection import get_cdp_connection_repository
+from infrastructure.repositories.queue_monitoring import get_queue_monitoring_repository
 from infrastructure.repositories.todo import get_todo_repository
 from ui.constants import FONT, PAGE_TITLE, build_favicon_head_html
 from ui.pages import register_pages
@@ -12,10 +18,20 @@ from ui.static import build_css
 
 
 def run_app() -> None:
+    configure_cdp_connection_manager(
+        CdpConnectionManager(
+            repository=get_cdp_connection_repository(),
+        )
+    )
     configure_todo_manager(
         TodoManager(
             repository=get_todo_repository(),
             task_queue=get_default_job_queue(),
+        )
+    )
+    configure_queue_monitoring_manager(
+        QueueMonitoringManager(
+            repository=get_queue_monitoring_repository(),
         )
     )
     register_pages()

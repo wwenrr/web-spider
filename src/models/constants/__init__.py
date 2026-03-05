@@ -1,4 +1,9 @@
-from .field_names import TODO_FIELD_NAMES
-from .table_names import TODO_TABLE_NAME
+from .field_names import CDP_CONNECTION_FIELD_NAMES, TODO_FIELD_NAMES
+from .table_names import CDP_CONNECTION_TABLE_NAME, TODO_TABLE_NAME
 
-__all__ = ["TODO_FIELD_NAMES", "TODO_TABLE_NAME"]
+__all__ = [
+    "CDP_CONNECTION_FIELD_NAMES",
+    "CDP_CONNECTION_TABLE_NAME",
+    "TODO_FIELD_NAMES",
+    "TODO_TABLE_NAME",
+]

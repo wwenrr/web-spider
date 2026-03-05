@@ -4,8 +4,16 @@ from fastapi import Request
 from fastapi.responses import RedirectResponse
 from nicegui import ui
 
-from ui.constants import PAGE_TITLE, ROUTE_DASHBOARD, ROUTE_MONITOR, ROUTE_ROOT, ROUTE_TODO
+from ui.constants import (
+    PAGE_TITLE,
+    ROUTE_CDP_CONNECTIONS,
+    ROUTE_DASHBOARD,
+    ROUTE_MONITOR,
+    ROUTE_ROOT,
+    ROUTE_TODO,
+)
 from ui.layout import build_page
+from ui.pages.cdp_connections import render_cdp_connection_crud_section
 from ui.pages.dashboard import render_dashboard_section
 from ui.pages.monitor import _refresh_monitor_page, render_monitor_section
 from ui.pages.todos import render_todo_crud_section
@@ -22,6 +30,10 @@ class ViewConfig:
 VIEW_CONFIGS = {
     "dashboard": ViewConfig(title="Dashboard", subtitle="Overview of AI usage."),
     "todo": ViewConfig(title="Todo CRUD", subtitle="Create, update, and manage todo items in one place."),
+    "cdp_connections": ViewConfig(
+        title="CDP Connections",
+        subtitle="Manage remote Chrome DevTools Protocol endpoints in one place.",
+    ),
     "monitor": ViewConfig(title="Job Monitor", subtitle="Monitor queue jobs and worker operations in one place."),
 }
 
@@ -56,6 +68,10 @@ def register_app_page() -> None:
     def todo_alias() -> RedirectResponse:
         return RedirectResponse(f"{ROUTE_ROOT}?view=todo")
 
+    @ui.page(ROUTE_CDP_CONNECTIONS)
+    def cdp_connections_alias() -> RedirectResponse:
+        return RedirectResponse(f"{ROUTE_ROOT}?view=cdp_connections")
+
     @ui.page(ROUTE_MONITOR)
     def monitor_alias() -> RedirectResponse:
         return RedirectResponse(f"{ROUTE_ROOT}?view=monitor")
@@ -86,6 +102,9 @@ def _poll_monitor_if_needed(current_view: str) -> None:
 def _render_view_content(current_view: str) -> None:
     if current_view == "dashboard":
         render_dashboard_section()
+        return
+    if current_view == "cdp_connections":
+        render_cdp_connection_crud_section()
         return
     if current_view == "monitor":
         render_monitor_section()

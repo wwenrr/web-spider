@@ -16,6 +16,7 @@ from .colors import (
     TEXT_3,
 )
 from .routes import (
+    ROUTE_CDP_CONNECTIONS,
     ROUTE_DASHBOARD,
     ROUTE_MONITOR,
     ROUTE_ROOT,
@@ -31,6 +32,7 @@ __all__ = [
     "BORDER",
     "FONT",
     "PAGE_TITLE",
+    "ROUTE_CDP_CONNECTIONS",
     "ROUTE_DASHBOARD",
     "ROUTE_MONITOR",
     "ROUTE_ROOT",

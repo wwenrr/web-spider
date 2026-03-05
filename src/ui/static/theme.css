@@ -9,4 +9,13 @@
   --color-border: #E6ECF3;
   --color-bg-alt: #FBFCFE;
   --sidebar-width: 288px;
+
+  /* Quasar color bridge: map framework "primary" family to app accent. */
+  --q-primary: var(--color-accent-hover);
+  --q-secondary: #7E8DA1;
+  --q-accent: var(--color-accent);
+  --q-positive: var(--color-accent-hover);
+  --q-negative: #9F2D2D;
+  --q-info: #2B5C98;
+  --q-warning: #8A6D14;
 }

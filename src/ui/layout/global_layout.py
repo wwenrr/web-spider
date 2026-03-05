@@ -2,7 +2,7 @@ from collections.abc import Callable
 
 from nicegui import ui
 
-from ui.constants import ROUTE_DASHBOARD, ROUTE_MONITOR, ROUTE_TODO, SIDEBAR_LOGO_HTML
+from ui.constants import ROUTE_CDP_CONNECTIONS, ROUTE_DASHBOARD, ROUTE_MONITOR, ROUTE_TODO, SIDEBAR_LOGO_HTML
 
 
 def build_shell(
@@ -38,6 +38,14 @@ def _render_sidebar(page: str, on_navigate: Callable[[str], None] | None = None)
 
         ui.label("OPERATIONS").classes("nav-section")
         _render_link("Todo CRUD", "checklist", ROUTE_TODO, "todo", page == "todo", on_navigate)
+        _render_link(
+            "CDP Connections",
+            "lan",
+            ROUTE_CDP_CONNECTIONS,
+            "cdp_connections",
+            page == "cdp_connections",
+            on_navigate,
+        )
 
         ui.label("MONITOR").classes("nav-section")
         _render_link("Job Monitor", "monitor", ROUTE_MONITOR, "monitor", page == "monitor", on_navigate)

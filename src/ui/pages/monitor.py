@@ -3,7 +3,8 @@ from datetime import datetime
 
 from nicegui import ui
 
-from infrastructure.queues.monitoring import QueueJob, QueueStats, get_queue_stats, list_queue_jobs
+from domain.monitoring.facade import get_queue_stats, list_queue_jobs
+from domain.monitoring.models import QueueJob, QueueStats
 from ui.constants import PAGE_TITLE, ROUTE_MONITOR
 from ui.layout import build_page
 
