@@ -35,10 +35,6 @@ def _render_sidebar(page: str) -> None:
         ui.label("MONITOR").classes("nav-section")
         _render_link("Job Monitor", "monitor", ROUTE_MONITOR, page == "monitor")
 
-        ui.label("INTEGRATIONS").classes("nav-section")
-        _render_link("WordPress", "language", ROUTE_DASHBOARD, False, disabled=True)
-        _render_link("Discord", "forum", ROUTE_DASHBOARD, False, disabled=True)
-
         ui.element("div").classes("nav-grow")
 
 

@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Final
 import os
 import sys
+import time
 from subprocess import CalledProcessError, run as subprocess_run
 
 from infrastructure.constants.db import DB_DIR_PATH
@@ -19,6 +20,7 @@ from pybgworker.task import task
 
 @task(name=TASK_LOG_TODO_CREATED)  # type: ignore[untyped-decorator]
 def log_todo_created(title: str) -> None:
+    time.sleep(10)
     print(f"[pybgworker] Todo created: {title}")
 
 
