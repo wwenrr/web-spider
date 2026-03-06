@@ -91,6 +91,13 @@
     grid-template-columns: 1fr;
     gap: 12px;
   }
+  .monitor-toolbar {
+    align-items: stretch;
+    padding: 12px;
+  }
+  .monitor-toolbar-group--meta {
+    align-items: flex-start;
+  }
   .monitor-job-row {
     grid-template-columns: 1fr;
     gap: 8px;

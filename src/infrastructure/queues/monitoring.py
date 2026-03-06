@@ -12,6 +12,12 @@ STATUS_DONE: Final[set[str]] = {"success", "done", "completed"}
 STATUS_FAILED: Final[set[str]] = {"failed", "error", "cancelled", "canceled", "dead"}
 STATUS_PENDING: Final[set[str]] = {"pending", "queued", "scheduled", "retry"}
 STATUS_RUNNING: Final[set[str]] = {"running", "processing", "in_progress", "locked"}
+QUEUE_STATUS_GROUPS: Final[dict[str, set[str]]] = {
+    "pending": STATUS_PENDING,
+    "running": STATUS_RUNNING,
+    "done": STATUS_DONE,
+    "failed": STATUS_FAILED,
+}
 
 
 @dataclass(frozen=True)
@@ -46,20 +52,25 @@ def get_queue_stats() -> QueueStats:
     return QueueStats(total=total, pending=pending, running=running, done=done, failed=failed)
 
 
-def list_queue_jobs(limit: int = 50) -> list[QueueJob]:
+def list_queue_jobs(limit: int = 50, offset: int = 0, status_filter: str | None = None) -> list[QueueJob]:
     db_path = _resolve_queue_db_path()
     if not db_path.exists():
         return []
 
+    where_clause, params = _build_status_filter_clause(status_filter)
     rows = _query(
         db_path,
         """
         SELECT id, name, status, attempt, max_retries, updated_at, created_at, finished_at, last_error
         FROM tasks
+        """
+        + where_clause
+        + """
         ORDER BY datetime(created_at) DESC, created_at DESC
         LIMIT ?
+        OFFSET ?
         """,
-        (limit,),
+        (*params, limit, offset),
     )
     return [
         QueueJob(
@@ -75,6 +86,22 @@ def list_queue_jobs(limit: int = 50) -> list[QueueJob]:
         )
         for row in rows
     ]
+
+
+def count_queue_jobs(status_filter: str | None = None) -> int:
+    db_path = _resolve_queue_db_path()
+    if not db_path.exists():
+        return 0
+
+    where_clause, params = _build_status_filter_clause(status_filter)
+    rows = _query(
+        db_path,
+        "SELECT COUNT(*) FROM tasks " + where_clause,
+        params,
+    )
+    if not rows:
+        return 0
+    return int(rows[0][0] or 0)
 
 
 def _fetch_status_counts() -> dict[str, int]:
@@ -96,6 +123,19 @@ def _query(db_path: Path, sql: str, params: tuple[object, ...]) -> list[tuple]:
             return conn.execute(sql, params).fetchall()
     except sqlite3.Error:
         return []
+
+
+def _build_status_filter_clause(status_filter: str | None) -> tuple[str, tuple[object, ...]]:
+    if status_filter is None:
+        return "", ()
+
+    normalized_filter = status_filter.strip().lower()
+    statuses = QUEUE_STATUS_GROUPS.get(normalized_filter)
+    if not statuses:
+        return "", ()
+
+    placeholders = ", ".join("?" for _ in statuses)
+    return f"WHERE lower(coalesce(status, 'unknown')) IN ({placeholders}) ", tuple(sorted(statuses))
 
 
 def _resolve_queue_db_path() -> Path:

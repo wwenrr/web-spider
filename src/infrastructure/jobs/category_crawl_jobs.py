@@ -8,6 +8,7 @@ from pybgworker.task import task
 from infrastructure.adapters.spiders.hobby_search_category_spider import HobbySearchCategorySpider
 from infrastructure.constants.db import DB_DIR_PATH
 from infrastructure.constants.queue import TASK_CRAWL_CATEGORY_JOB, TASK_CRAWL_PRODUCT_URL
+from infrastructure.helpers.settings import get_bgworker_max_retries
 from infrastructure.repositories.category_crawl_job import get_category_crawl_job_repository
 from infrastructure.repositories.product import get_product_repository
 from infrastructure.queues import get_default_job_queue
@@ -18,7 +19,7 @@ os.environ.setdefault("PYBGWORKER_DB", str(DB_DIR / "pybgworker.db"))
 bg_utils.DB_PATH = os.environ["PYBGWORKER_DB"]
 
 
-@task(name=TASK_CRAWL_CATEGORY_JOB)
+@task(name=TASK_CRAWL_CATEGORY_JOB, retries=get_bgworker_max_retries())
 def crawl_category_job(category_crawl_job_id: int) -> None:
     category_repository = get_category_crawl_job_repository()
     category_job = category_repository.get_job(category_crawl_job_id)

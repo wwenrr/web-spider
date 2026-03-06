@@ -9,6 +9,7 @@ from pybgworker.task import task
 from infrastructure.adapters.spiders.hobby_search_product_spider import HobbySearchProductSpider
 from infrastructure.constants.db import DB_DIR_PATH
 from infrastructure.constants.queue import TASK_CRAWL_PRODUCT_URL
+from infrastructure.helpers.settings import get_bgworker_max_retries
 from infrastructure.repositories.product import get_product_repository
 
 DB_DIR: Final[Path] = DB_DIR_PATH
@@ -17,7 +18,7 @@ os.environ.setdefault("PYBGWORKER_DB", str(DB_DIR / "pybgworker.db"))
 bg_utils.DB_PATH = os.environ["PYBGWORKER_DB"]
 
 
-@task(name=TASK_CRAWL_PRODUCT_URL)
+@task(name=TASK_CRAWL_PRODUCT_URL, retries=get_bgworker_max_retries())
 def crawl_product_url(product_id: int) -> None:
     repository = get_product_repository()
     product = repository.get_product(product_id)
