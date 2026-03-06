@@ -23,7 +23,6 @@ from .routes import (
     ROUTE_ROOT,
     ROUTE_SPY_1999,
 )
-from .table_ids import TABLE_ID_JOBS
 
 __all__ = [
     "ACCENT",
@@ -41,7 +40,6 @@ __all__ = [
     "ROUTE_SPY_1999",
     "SIDEBAR_LOGO_HTML",
     "SIDEBAR_W",
-    "TABLE_ID_JOBS",
     "TEXT",
     "TEXT_2",
     "TEXT_3",
