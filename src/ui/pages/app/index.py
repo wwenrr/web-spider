@@ -10,7 +10,6 @@ from ui.constants import (
     ROUTE_MONITOR,
     ROUTE_ROOT,
     ROUTE_SPY_1999,
-    ROUTE_TODO,
 )
 from ui.pages.app.renderers import render_spy_page, render_standard_page
 from ui.pages.monitor.index import _refresh_monitor_page
@@ -32,11 +31,6 @@ PAGE_CONFIGS: dict[str, PageConfig] = {
         title="Dashboard",
         subtitle="Overview of AI usage.",
     ),
-    "todo": PageConfig(
-        key="todo",
-        title="Todo CRUD",
-        subtitle="Create, update, and manage todo items in one place.",
-    ),
     "cdp_connections": PageConfig(
         key="cdp_connections",
         title="CDP Connections",
@@ -56,7 +50,6 @@ PAGE_CONFIGS: dict[str, PageConfig] = {
 
 VIEW_TO_ROUTE: dict[str, str] = {
     "dashboard": ROUTE_DASHBOARD,
-    "todo": ROUTE_TODO,
     "cdp_connections": DEFAULT_ROUTE,
     "monitor": ROUTE_MONITOR,
     "spy_1999": ROUTE_SPY_1999,
@@ -74,11 +67,6 @@ def register_app_page() -> None:
     @ui.page(ROUTE_DASHBOARD)
     def dashboard_page() -> None:
         config = PAGE_CONFIGS["dashboard"]
-        render_standard_page(config.key, config.title, config.subtitle)
-
-    @ui.page(ROUTE_TODO)
-    def todo_page() -> None:
-        config = PAGE_CONFIGS["todo"]
         render_standard_page(config.key, config.title, config.subtitle)
 
     @ui.page(DEFAULT_ROUTE)

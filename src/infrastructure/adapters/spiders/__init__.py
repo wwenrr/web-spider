@@ -1,1 +1,0 @@
-"""Spider adapters package."""

@@ -21,7 +21,6 @@ from .routes import (
     ROUTE_MONITOR,
     ROUTE_ROOT,
     ROUTE_SPY_1999,
-    ROUTE_TODO,
 )
 from .table_ids import TABLE_ID_JOBS
 
@@ -38,7 +37,6 @@ __all__ = [
     "ROUTE_MONITOR",
     "ROUTE_ROOT",
     "ROUTE_SPY_1999",
-    "ROUTE_TODO",
     "SIDEBAR_LOGO_HTML",
     "SIDEBAR_W",
     "TABLE_ID_JOBS",

@@ -6,7 +6,6 @@ from ui.pages.cdp_connections.index import render_cdp_connection_crud_section
 from ui.pages.dashboard.index import render_dashboard_section
 from ui.pages.monitor.index import render_monitor_section
 from ui.pages.spy_1999.index import render_spy_1999_section
-from ui.pages.todos.index import render_todo_crud_section
 
 
 def render_standard_page(page_key: str, title: str, subtitle: str) -> None:
@@ -44,4 +43,4 @@ def _render_view_content(page_key: str) -> None:
     if page_key == "spy_1999":
         render_spy_1999_section()
         return
-    render_todo_crud_section()
+    render_dashboard_section()
