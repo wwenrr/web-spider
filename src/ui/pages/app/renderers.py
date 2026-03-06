@@ -4,9 +4,10 @@ from ui.constants import PAGE_TITLE
 from ui.layout import build_page
 from ui.pages.cdp_connections.index import render_cdp_connection_crud_section
 from ui.pages.dashboard.index import render_dashboard_section
+from ui.pages.managed_browsers.index import render_managed_browsers_section
 from ui.pages.monitor.index import render_monitor_section
-from ui.pages.spy_1999.products import render_products_crawl_section
 from ui.pages.spy_1999.index import render_spy_1999_section
+from ui.pages.spy_1999.products import render_products_crawl_section
 
 
 def render_standard_page(page_key: str, title: str, subtitle: str) -> None:
@@ -37,6 +38,9 @@ def _render_view_content(page_key: str) -> None:
         return
     if page_key == "cdp_connections":
         render_cdp_connection_crud_section()
+        return
+    if page_key == "managed_browsers":
+        render_managed_browsers_section()
         return
     if page_key == "monitor":
         render_monitor_section()

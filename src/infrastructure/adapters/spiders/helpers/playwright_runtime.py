@@ -4,6 +4,7 @@ from urllib.parse import quote, urlsplit, urlunsplit
 
 from playwright.sync_api import Browser, BrowserContext, Page, Playwright, sync_playwright
 
+from infrastructure.helpers.managed_browser_runtime import get_managed_browser_runtime
 from infrastructure.models.cdp_connection import CdpConnection
 from infrastructure.repositories.cdp_connection import get_cdp_connection_repository
 
@@ -33,61 +34,52 @@ class SharedPlaywrightRuntime:
         self._lock = Lock()
         self._playwright: Playwright | None = None
         self._cdp_browser: Browser | None = None
-        self._cdp_connection_id: int | None = None
-        self._local_browser: Browser | None = None
+        self._browser_cache_key: str | None = None
 
     def open_page(self, *, headless: bool) -> PlaywrightPageSession:
         with self._lock:
-            cdp_session = self._try_open_cdp_page()
-            if cdp_session is not None:
-                return cdp_session
-            return self._open_local_page(headless=headless)
+            external_cdp_session = self._try_open_external_cdp_page()
+            if external_cdp_session is not None:
+                return external_cdp_session
+            managed_browser_session = self._try_open_managed_browser_page(headless=headless)
+            if managed_browser_session is not None:
+                return managed_browser_session
+            raise RuntimeError("No active external CDP connection or managed browser is available.")
 
-    def _try_open_cdp_page(self) -> PlaywrightPageSession | None:
+    def _try_open_external_cdp_page(self) -> PlaywrightPageSession | None:
         active_connection = _get_active_cdp_connection()
         if active_connection is None:
-            self._disconnect_cdp_browser()
+            self._disconnect_cached_browser(except_cache_key=None)
             return None
 
-        browser = self._resolve_cdp_browser(active_connection)
+        cache_key = f"cdp:{active_connection.id}"
+        browser = self._resolve_cdp_browser(cache_key=cache_key, endpoint_url=_build_cdp_endpoint(active_connection))
         if browser is None:
             return None
+        return _open_browser_page(browser=browser, source="cdp")
 
-        context = browser.contexts[0] if browser.contexts else browser.new_context()
-        page = context.new_page()
-        return PlaywrightPageSession(page=page, source="cdp", _owned_context=None)
+    def _try_open_managed_browser_page(self, *, headless: bool) -> PlaywrightPageSession | None:
+        runtime = get_managed_browser_runtime()
+        browser_config = runtime.ensure_active_browser(headless=headless)
+        cache_key = f"managed:{browser_config.id}"
+        browser = self._resolve_cdp_browser(cache_key=cache_key, endpoint_url=runtime.endpoint_for(browser_config))
+        if browser is None:
+            return None
+        return _open_browser_page(browser=browser, source="managed")
 
-    def _open_local_page(self, *, headless: bool) -> PlaywrightPageSession:
-        playwright = self._get_playwright()
-        if self._local_browser is None or not self._local_browser.is_connected():
-            self._local_browser = playwright.chromium.launch(headless=headless)
-
-        context = self._local_browser.new_context(
-            locale=DEFAULT_LOCALE,
-            user_agent=DEFAULT_USER_AGENT,
-        )
-        page = context.new_page()
-        return PlaywrightPageSession(page=page, source="local", _owned_context=context)
-
-    def _resolve_cdp_browser(self, connection: CdpConnection) -> Browser | None:
-        if (
-            self._cdp_browser is not None
-            and self._cdp_browser.is_connected()
-            and self._cdp_connection_id == connection.id
-        ):
+    def _resolve_cdp_browser(self, *, cache_key: str, endpoint_url: str) -> Browser | None:
+        if self._cdp_browser is not None and self._cdp_browser.is_connected() and self._browser_cache_key == cache_key:
             return self._cdp_browser
 
-        self._disconnect_cdp_browser()
+        self._disconnect_cached_browser(except_cache_key=cache_key)
         try:
-            self._cdp_browser = self._get_playwright().chromium.connect_over_cdp(
-                endpoint_url=_build_cdp_endpoint(connection),
-            )
+            self._cdp_browser = self._get_playwright().chromium.connect_over_cdp(endpoint_url=endpoint_url)
         except Exception:
             self._cdp_browser = None
-            self._cdp_connection_id = None
+            self._browser_cache_key = None
             return None
 
-        self._cdp_connection_id = connection.id
+        self._browser_cache_key = cache_key
         return self._cdp_browser
 
     def _get_playwright(self) -> Playwright:
@@ -95,18 +87,22 @@ class SharedPlaywrightRuntime:
             self._playwright = sync_playwright().start()
         return self._playwright
 
-    def _disconnect_cdp_browser(self) -> None:
+    def _disconnect_cached_browser(self, *, except_cache_key: str | None) -> None:
         if self._cdp_browser is None:
-            self._cdp_connection_id = None
+            self._browser_cache_key = except_cache_key if self._browser_cache_key == except_cache_key else None
             return
-
+        if except_cache_key is not None and self._browser_cache_key == except_cache_key and self._cdp_browser.is_connected():
+            return
         try:
             self._cdp_browser.close()
         except Exception:
             pass
         finally:
             self._cdp_browser = None
-            self._cdp_connection_id = None
+            self._browser_cache_key = None
+
+
+_shared_playwright_runtime: SharedPlaywrightRuntime | None = None
 
 
 def get_shared_playwright_runtime() -> SharedPlaywrightRuntime:
@@ -194,4 +190,10 @@ def _normalize_cdp_scheme(scheme: str, path: str) -> str:
     return "http"
 
 
-_shared_playwright_runtime: SharedPlaywrightRuntime | None = None
+def _open_browser_page(browser: Browser, source: str) -> PlaywrightPageSession:
+    context = browser.contexts[0] if browser.contexts else browser.new_context(
+        locale=DEFAULT_LOCALE,
+        user_agent=DEFAULT_USER_AGENT,
+    )
+    page = context.new_page()
+    return PlaywrightPageSession(page=page, source=source, _owned_context=None)

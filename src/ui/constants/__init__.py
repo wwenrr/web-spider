@@ -18,6 +18,7 @@ from .colors import (
 from .routes import (
     ROUTE_CDP_CONNECTIONS,
     ROUTE_DASHBOARD,
+    ROUTE_MANAGED_BROWSERS,
     ROUTE_MONITOR,
     ROUTE_PRODUCTS_CRAWL,
     ROUTE_ROOT,
@@ -34,6 +35,7 @@ __all__ = [
     "PAGE_TITLE",
     "ROUTE_CDP_CONNECTIONS",
     "ROUTE_DASHBOARD",
+    "ROUTE_MANAGED_BROWSERS",
     "ROUTE_MONITOR",
     "ROUTE_PRODUCTS_CRAWL",
     "ROUTE_ROOT",

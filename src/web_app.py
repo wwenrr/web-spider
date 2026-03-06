@@ -6,15 +6,19 @@ from core.category_crawls.facade import configure_category_crawl_manager
 from core.category_crawls.services import CategoryCrawlManager
 from core.cdp_connections.facade import configure_cdp_connection_manager
 from core.cdp_connections.services import CdpConnectionManager
+from core.managed_browsers.facade import configure_managed_browser_manager
+from core.managed_browsers.services import ManagedBrowserManager
 from core.monitoring.facade import configure_queue_monitoring_manager
 from core.monitoring.services import QueueMonitoringManager
 from core.products.facade import configure_product_manager
 from core.products.services import ProductManager
 from core.todos.facade import configure_todo_manager
 from core.todos.services import TodoManager
+from infrastructure.helpers.managed_browser_runtime import get_managed_browser_runtime
 from infrastructure.queues import get_default_job_queue
 from infrastructure.repositories.category_crawl_job import get_category_crawl_job_repository
 from infrastructure.repositories.cdp_connection import get_cdp_connection_repository
+from infrastructure.repositories.managed_browser import get_managed_browser_repository
 from infrastructure.repositories.product import get_product_repository
 from infrastructure.repositories.queue_monitoring import get_queue_monitoring_repository
 from infrastructure.repositories.todo import get_todo_repository
@@ -33,6 +37,12 @@ def run_app() -> None:
     configure_cdp_connection_manager(
         CdpConnectionManager(
             repository=get_cdp_connection_repository(),
+        )
+    )
+    configure_managed_browser_manager(
+        ManagedBrowserManager(
+            repository=get_managed_browser_repository(),
+            runtime=get_managed_browser_runtime(),
         )
     )
     configure_todo_manager(

@@ -7,12 +7,14 @@ from nicegui import ui
 from ui.constants import (
     ROUTE_CDP_CONNECTIONS,
     ROUTE_DASHBOARD,
+    ROUTE_MANAGED_BROWSERS,
     ROUTE_MONITOR,
     ROUTE_PRODUCTS_CRAWL,
     ROUTE_ROOT,
     ROUTE_SPY_1999,
 )
 from ui.pages.app.renderers import render_spy_page, render_standard_page
+from ui.pages.managed_browsers.index import refresh_managed_browsers_section
 from ui.pages.monitor.index import _refresh_monitor_page
 from ui.pages.spy_1999.index import refresh_spy_1999_section
 from ui.pages.spy_1999.products import refresh_products_crawl_section
@@ -39,6 +41,11 @@ PAGE_CONFIGS: dict[str, PageConfig] = {
         title="CDP Connections",
         subtitle="Manage remote Chrome DevTools Protocol endpoints in one place.",
     ),
+    "managed_browsers": PageConfig(
+        key="managed_browsers",
+        title="Managed Browsers",
+        subtitle="Manage reusable local browser fallbacks for Playwright crawls.",
+    ),
     "monitor": PageConfig(
         key="monitor",
         title="Job Monitor",
@@ -59,6 +66,7 @@ PAGE_CONFIGS: dict[str, PageConfig] = {
 VIEW_TO_ROUTE: dict[str, str] = {
     "dashboard": ROUTE_DASHBOARD,
     "cdp_connections": DEFAULT_ROUTE,
+    "managed_browsers": ROUTE_MANAGED_BROWSERS,
     "monitor": ROUTE_MONITOR,
     "products_crawl": ROUTE_PRODUCTS_CRAWL,
     "spy_1999": ROUTE_SPY_1999,
@@ -86,6 +94,12 @@ def register_app_page() -> None:
     @ui.page(LEGACY_CDP_ROUTE)
     def cdp_connections_kebab_alias() -> RedirectResponse:
         return RedirectResponse(DEFAULT_ROUTE)
+
+    @ui.page(ROUTE_MANAGED_BROWSERS)
+    def managed_browsers_page() -> None:
+        config = PAGE_CONFIGS["managed_browsers"]
+        render_standard_page(config.key, config.title, config.subtitle)
+        ui.timer(5.0, refresh_managed_browsers_section)
 
     @ui.page(ROUTE_MONITOR)
     def monitor_page() -> None:

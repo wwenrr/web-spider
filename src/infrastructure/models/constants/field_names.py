@@ -48,3 +48,24 @@ CATEGORY_CRAWL_JOB_FIELD_NAMES: Final[tuple[str, ...]] = (
     "created_at",
     "updated_at",
 )
+
+MANAGED_BROWSER_FIELD_NAMES: Final[tuple[str, ...]] = (
+    "id",
+    "name",
+    "browser_type",
+    "host",
+    "port",
+    "executable_path",
+    "user_data_dir",
+    "headless",
+    "launch_args",
+    "is_active",
+    "status",
+    "pid",
+    "last_started_at",
+    "last_seen_at",
+    "notes",
+    "error_message",
+    "created_at",
+    "updated_at",
+)

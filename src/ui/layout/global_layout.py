@@ -5,6 +5,7 @@ from nicegui import ui
 from ui.constants import (
     ROUTE_CDP_CONNECTIONS,
     ROUTE_DASHBOARD,
+    ROUTE_MANAGED_BROWSERS,
     ROUTE_MONITOR,
     ROUTE_PRODUCTS_CRAWL,
     ROUTE_SPY_1999,
@@ -61,6 +62,14 @@ def _render_sidebar(page: str, on_navigate: Callable[[str], None] | None = None)
             ROUTE_CDP_CONNECTIONS,
             "cdp_connections",
             page == "cdp_connections",
+            on_navigate,
+        )
+        _render_link(
+            "Managed Browsers",
+            "web",
+            ROUTE_MANAGED_BROWSERS,
+            "managed_browsers",
+            page == "managed_browsers",
             on_navigate,
         )
 

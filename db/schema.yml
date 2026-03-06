@@ -105,3 +105,41 @@ category_crawl_job:
   Type: DATETIME
 - Field: updated_at
   Type: DATETIME
+
+managed_browser:
+- Field: id
+  Type: INTEGER
+- Field: name
+  Type: VARCHAR(120)
+- Field: browser_type
+  Type: VARCHAR(32)
+- Field: host
+  Type: VARCHAR(255)
+- Field: port
+  Type: INTEGER
+- Field: executable_path
+  Type: VARCHAR(1024)
+- Field: user_data_dir
+  Type: VARCHAR(1024)
+- Field: headless
+  Type: INTEGER
+- Field: launch_args
+  Type: TEXT
+- Field: is_active
+  Type: INTEGER
+- Field: status
+  Type: VARCHAR(32)
+- Field: pid
+  Type: INTEGER
+- Field: last_started_at
+  Type: DATETIME
+- Field: last_seen_at
+  Type: DATETIME
+- Field: notes
+  Type: TEXT
+- Field: error_message
+  Type: TEXT
+- Field: created_at
+  Type: DATETIME
+- Field: updated_at
+  Type: DATETIME

@@ -115,3 +115,9 @@
   html,
   body { overflow: auto !important; }
 }
+
+@media (max-width: 960px) {
+  .mb-native-form {
+    grid-template-columns: 1fr;
+  }
+}
