@@ -4,8 +4,9 @@ from re import DOTALL, IGNORECASE, Pattern, compile as re_compile, sub
 
 from playwright.sync_api import Page
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
-from playwright.sync_api import sync_playwright
 from scrapling import Selector
+
+from infrastructure.adapters.spiders.helpers import get_shared_playwright_runtime
 
 PRODUCT_DESCRIPTION_BLOCK_RE: Pattern[str] = re_compile(
     r"商品説明</h2>(?P<body>.*?)(?:<h2[^>]*>\s*商品仕様\s*</h2>)",
@@ -15,10 +16,6 @@ PRODUCT_REMOTE_ID_RE: Pattern[str] = re_compile(r"/(?P<remote_id>\d+)(?:[/?#].*)
 REQUEST_TIMEOUT_SECONDS = 30
 PAGE_TIMEOUT_MS = REQUEST_TIMEOUT_SECONDS * 1000
 PLAYWRIGHT_HEADLESS = False
-DEFAULT_USER_AGENT = (
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
-)
 
 
 @dataclass(frozen=True)
@@ -62,27 +59,22 @@ class HobbySearchProductSpider:
 
 
 def _fetch_html(url: str) -> tuple[bytes, str]:
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=PLAYWRIGHT_HEADLESS)
-        page = browser.new_page(
-            user_agent=DEFAULT_USER_AGENT,
-            locale="ja-JP",
-        )
-        page.set_default_timeout(PAGE_TIMEOUT_MS)
+    session = get_shared_playwright_runtime().open_page(headless=PLAYWRIGHT_HEADLESS)
+    page = session.page
+    page.set_default_timeout(PAGE_TIMEOUT_MS)
+    try:
+        page.goto(url, wait_until="domcontentloaded")
+        _handle_age_gate(page)
+        page.wait_for_selector("h1.c-product-detail__info-title")
+        page.wait_for_selector(".c-product-detail__info-price-element")
+        page.wait_for_selector("dt")
         try:
-            page.goto(url, wait_until="domcontentloaded")
-            _handle_age_gate(page)
-            page.wait_for_selector("h1.c-product-detail__info-title")
-            page.wait_for_selector(".c-product-detail__info-price-element")
-            page.wait_for_selector("dt")
-            try:
-                page.wait_for_load_state("networkidle", timeout=5000)
-            except PlaywrightTimeoutError:
-                pass
-            html = page.content()
-        finally:
-            page.close()
-            browser.close()
+            page.wait_for_load_state("networkidle", timeout=5000)
+        except PlaywrightTimeoutError:
+            pass
+        html = page.content()
+    finally:
+        session.close()
     return html.encode("utf-8"), "utf-8"
 
 
