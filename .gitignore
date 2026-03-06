@@ -161,3 +161,4 @@ ehthumbs_vista_thumb.db
 
 plans/*
 !plans/.keep
+!db/data/.keep

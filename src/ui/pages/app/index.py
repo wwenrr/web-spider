@@ -14,6 +14,7 @@ from ui.constants import (
 )
 from ui.pages.app.renderers import render_spy_page, render_standard_page
 from ui.pages.monitor.index import _refresh_monitor_page
+from ui.pages.spy_1999.index import refresh_spy_1999_section
 from ui.pages.spy_1999.products import refresh_products_crawl_section
 
 LEGACY_CDP_ROUTE = "/cdp-connections"
@@ -104,3 +105,5 @@ def register_app_page() -> None:
         active_tab = tab if tab in {"categories", "rankings"} else "categories"
         config = PAGE_CONFIGS["spy_1999"]
         render_spy_page(config.key, config.title, config.subtitle, active_tab)
+        if active_tab == "categories":
+            ui.timer(5.0, refresh_spy_1999_section)

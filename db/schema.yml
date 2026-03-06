@@ -75,3 +75,33 @@ product:
   Type: DATETIME
 - Field: updated_at
   Type: DATETIME
+
+category_crawl_job:
+- Field: id
+  Type: INTEGER
+- Field: site_key
+  Type: VARCHAR(64)
+- Field: category_name
+  Type: VARCHAR(255)
+- Field: category_url
+  Type: VARCHAR(2048)
+- Field: normalized_category_url
+  Type: VARCHAR(2048)
+- Field: crawl_status
+  Type: VARCHAR(32)
+- Field: total_products
+  Type: INTEGER
+- Field: products_per_page
+  Type: INTEGER
+- Field: total_pages
+  Type: INTEGER
+- Field: enqueued_products_count
+  Type: INTEGER
+- Field: crawl_at
+  Type: DATETIME
+- Field: error_message
+  Type: TEXT
+- Field: created_at
+  Type: DATETIME
+- Field: updated_at
+  Type: DATETIME

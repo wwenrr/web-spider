@@ -1,0 +1,2 @@
+bgworker:
+  concurrency: 5

@@ -6,11 +6,19 @@ from typing import Final
 
 from nicegui import ui
 
-from core.products.facade import delete_product, enqueue_product_url, list_products
-from infrastructure.models.product import Product
+from core.products.facade import count_products, delete_product, enqueue_product_url, list_products
+from infrastructure.models.product import Product, ProductCrawlStatus
 from ui.helpers import show_error, show_success
 
 PRODUCT_URL_INPUT_ID: Final[str] = "spy-products-url-input"
+PRODUCTS_PAGE_SIZE: Final[int] = 20
+PRODUCT_STATUS_FILTERS: Final[tuple[tuple[str, str | None], ...]] = (
+    ("All", None),
+    ("Pending", ProductCrawlStatus.PENDING.value),
+    ("Processing", ProductCrawlStatus.PROCESSING.value),
+    ("Done", ProductCrawlStatus.DONE.value),
+    ("Failed", ProductCrawlStatus.FAILED.value),
+)
 _refresh_callback: Callable[[], None] | None = None
 
 
@@ -19,6 +27,8 @@ def render_products_crawl_section() -> None:
         "gallery_images": [],
         "gallery_title": "",
         "gallery_index": 0,
+        "page": 1,
+        "status_filter": None,
     }
 
     with ui.element("section").classes("spy-products-card"):
@@ -31,7 +41,26 @@ def render_products_crawl_section() -> None:
 
         @ui.refreshable
         def render_products_index() -> None:
-            products = list_products(limit=50)
+            page = _state_page(state)
+            status_filter = _state_status_filter(state)
+            total_products = count_products(crawl_status=status_filter)
+            total_pages = max(1, (total_products + PRODUCTS_PAGE_SIZE - 1) // PRODUCTS_PAGE_SIZE)
+            current_page = min(page, total_pages)
+            if current_page != page:
+                state["page"] = current_page
+            offset = (current_page - 1) * PRODUCTS_PAGE_SIZE
+            products = list_products(limit=PRODUCTS_PAGE_SIZE, offset=offset, crawl_status=status_filter)
+
+            _render_products_toolbar(
+                active_status=status_filter,
+                total_products=total_products,
+                current_page=current_page,
+                total_pages=total_pages,
+                on_select_status=lambda next_status: _set_status_filter(next_status, state, render_products_index.refresh),
+                on_previous=lambda: _change_page(-1, state, total_pages, render_products_index.refresh),
+                on_next=lambda: _change_page(1, state, total_pages, render_products_index.refresh),
+            )
+
             if not products:
                 _render_text("span", "No products in the crawl queue yet.", "todo-empty")
                 return
@@ -89,6 +118,45 @@ async def _submit_product_url(refresh_index: Callable[[], None]) -> None:
     await _clear_product_url_input()
     refresh_index()
     show_success("Product queued as pending.")
+
+
+def _render_products_toolbar(
+    active_status: str | None,
+    total_products: int,
+    current_page: int,
+    total_pages: int,
+    on_select_status: Callable[[str | None], None],
+    on_previous: Callable[[], None],
+    on_next: Callable[[], None],
+) -> None:
+    with ui.element("div").classes("spy-products-toolbar"):
+        with ui.element("div").classes("spy-products-toolbar-group"):
+            _render_text("span", "Status", "spy-products-toolbar-kicker")
+            with ui.element("div").classes("spy-products-filter-row"):
+                for label, value in PRODUCT_STATUS_FILTERS:
+                    classes = "spy-products-filter spy-products-filter--active" if value == active_status else "spy-products-filter"
+                    with ui.element("button").classes(classes).props("type=button").on(
+                        "click",
+                        lambda _event=None, next_status=value: on_select_status(next_status),
+                    ):
+                        _render_text("span", label, "spy-products-filter-label")
+
+        with ui.element("div").classes("spy-products-toolbar-group spy-products-toolbar-group--meta"):
+            _render_text("span", f"{total_products} items", "spy-products-pagination-copy")
+            with ui.element("div").classes("spy-products-pagination"):
+                previous_props = "type=button disabled" if current_page <= 1 else "type=button"
+                next_props = "type=button disabled" if current_page >= total_pages else "type=button"
+                previous_button = ui.element("button").classes("spy-products-page-btn").props(previous_props)
+                if current_page > 1:
+                    previous_button.on("click", lambda _event=None: on_previous())
+                with previous_button:
+                    _render_text("span", "Prev", "spy-products-page-btn-label")
+                _render_text("span", f"Page {current_page} / {total_pages}", "spy-products-page-indicator")
+                next_button = ui.element("button").classes("spy-products-page-btn").props(next_props)
+                if current_page < total_pages:
+                    next_button.on("click", lambda _event=None: on_next())
+                with next_button:
+                    _render_text("span", "Next", "spy-products-page-btn-label")
 
 
 def _render_products_table(
@@ -186,6 +254,23 @@ def _delete_product(product_id: int, refresh_index: Callable[[], None]) -> None:
 
     refresh_index()
     show_success("Product deleted.")
+
+
+def _change_page(step: int, state: dict[str, object], total_pages: int, refresh_index: Callable[[], None]) -> None:
+    current_page = _state_page(state)
+    next_page = max(1, min(current_page + step, total_pages))
+    if next_page == current_page:
+        return
+    state["page"] = next_page
+    refresh_index()
+
+
+def _set_status_filter(next_status: str | None, state: dict[str, object], refresh_index: Callable[[], None]) -> None:
+    if _state_status_filter(state) == next_status:
+        return
+    state["status_filter"] = next_status
+    state["page"] = 1
+    refresh_index()
 
 
 def _render_gallery_modal(
@@ -327,6 +412,23 @@ def _gallery_index(state: dict[str, object], images_count: int) -> int:
     if images_count <= 0:
         return 0
     return max(0, min(raw_index, images_count - 1))
+
+
+def _state_page(state: dict[str, object]) -> int:
+    raw_page = state.get("page")
+    if not isinstance(raw_page, int):
+        return 1
+    return max(1, raw_page)
+
+
+def _state_status_filter(state: dict[str, object]) -> str | None:
+    raw_status = state.get("status_filter")
+    if not isinstance(raw_status, str):
+        return None
+    normalized_status = raw_status.strip()
+    if normalized_status == "":
+        return None
+    return normalized_status
 
 
 async def _read_product_url_input() -> str:

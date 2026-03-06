@@ -12,9 +12,19 @@ DUPLICATE_REMOTE_URL_MESSAGE: Final[str] = "Product URL already exists."
 
 
 class ProductRepository:
-    def list_products(self, limit: int = 100) -> list[Product]:
+    def list_products(self, limit: int = 100, offset: int = 0, crawl_status: str | None = None) -> list[Product]:
+        query = Product.select().order_by(Product.created_at.desc())
+        if crawl_status is not None:
+            query = query.where(Product.crawl_status == crawl_status)
         with database:
-            return list(Product.select().order_by(Product.created_at.desc()).limit(limit))
+            return list(query.limit(limit).offset(offset))
+
+    def count_products(self, crawl_status: str | None = None) -> int:
+        query = Product.select()
+        if crawl_status is not None:
+            query = query.where(Product.crawl_status == crawl_status)
+        with database:
+            return cast(int, query.count())
 
     def get_product(self, product_id: int) -> Product | None:
         with database:
@@ -31,6 +41,14 @@ class ProductRepository:
                 return cast(Product, Product.create(**payload))
             except IntegrityError as exc:
                 raise ValueError(DUPLICATE_REMOTE_URL_MESSAGE) from exc
+
+    def create_pending_product_if_missing(self, remote_url: str) -> Product | None:
+        try:
+            return self.create_pending_product(remote_url)
+        except ValueError as exc:
+            if str(exc) == DUPLICATE_REMOTE_URL_MESSAGE:
+                return None
+            raise
 
     def mark_product_crawl_done(self, product_id: int) -> bool:
         with database:

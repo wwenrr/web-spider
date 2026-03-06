@@ -4,6 +4,7 @@ import sys
 from subprocess import CalledProcessError, run as subprocess_run
 
 from infrastructure.constants.queue import DEFAULT_WORKER_APP_NAME
+from infrastructure.helpers.settings import get_bgworker_concurrency
 
 
 def run_worker() -> None:
@@ -19,6 +20,8 @@ def run_worker() -> None:
         # Configure pybgworker DB location via environment variable
         "PYBGWORKER_DB": str(db_dir / "pybgworker.db"),
     }
+    if "PYBGWORKER_CONCURRENCY" not in env:
+        env["PYBGWORKER_CONCURRENCY"] = str(get_bgworker_concurrency())
 
     completed = subprocess_run(
         [

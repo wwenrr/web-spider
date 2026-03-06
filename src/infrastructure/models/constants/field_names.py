@@ -32,3 +32,19 @@ PRODUCT_FIELD_NAMES: Final[tuple[str, ...]] = (
     "created_at",
     "updated_at",
 )
+CATEGORY_CRAWL_JOB_FIELD_NAMES: Final[tuple[str, ...]] = (
+    "id",
+    "site_key",
+    "category_name",
+    "category_url",
+    "normalized_category_url",
+    "crawl_status",
+    "total_products",
+    "products_per_page",
+    "total_pages",
+    "enqueued_products_count",
+    "crawl_at",
+    "error_message",
+    "created_at",
+    "updated_at",
+)

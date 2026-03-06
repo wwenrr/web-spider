@@ -1,3 +1,4 @@
+from .category_crawl_job import CategoryCrawlJobRepository, get_category_crawl_job_repository
 from .cdp_connection import CdpConnectionRepository, get_cdp_connection_repository
 from .product import ProductRepository, get_product_repository
 from .todo import TodoRepository, get_todo_repository, get_job_repository
@@ -5,11 +6,13 @@ from .migrate_history import MigrateHistoryRepository, get_migrate_history_repos
 from .queue_monitoring import QueueMonitoringRepository, get_queue_monitoring_repository
 
 __all__ = [
+    "CategoryCrawlJobRepository",
     "CdpConnectionRepository",
     "ProductRepository",
     "TodoRepository",
     "MigrateHistoryRepository",
     "QueueMonitoringRepository",
+    "get_category_crawl_job_repository",
     "get_cdp_connection_repository",
     "get_product_repository",
     "get_todo_repository",

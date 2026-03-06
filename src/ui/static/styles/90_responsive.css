@@ -31,8 +31,28 @@
   .spy-categories {
     grid-template-columns: 1fr;
   }
+  .spy-category-jobs-head {
+    flex-direction: column;
+  }
+  .spy-sub-item {
+    grid-template-columns: 1fr;
+  }
+  .spy-sub-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
   .spy-products-form-row {
     grid-template-columns: 1fr;
+  }
+  .spy-products-toolbar {
+    align-items: stretch;
+    padding: 12px;
+  }
+  .spy-products-toolbar-group--meta {
+    align-items: flex-start;
+  }
+  .spy-products-pagination {
+    justify-content: flex-start;
   }
   .spy-products-submit {
     width: 100%;

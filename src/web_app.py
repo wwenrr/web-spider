@@ -2,6 +2,8 @@ from pathlib import Path
 
 from nicegui import app, ui
 
+from core.category_crawls.facade import configure_category_crawl_manager
+from core.category_crawls.services import CategoryCrawlManager
 from core.cdp_connections.facade import configure_cdp_connection_manager
 from core.cdp_connections.services import CdpConnectionManager
 from core.monitoring.facade import configure_queue_monitoring_manager
@@ -11,6 +13,7 @@ from core.products.services import ProductManager
 from core.todos.facade import configure_todo_manager
 from core.todos.services import TodoManager
 from infrastructure.queues import get_default_job_queue
+from infrastructure.repositories.category_crawl_job import get_category_crawl_job_repository
 from infrastructure.repositories.cdp_connection import get_cdp_connection_repository
 from infrastructure.repositories.product import get_product_repository
 from infrastructure.repositories.queue_monitoring import get_queue_monitoring_repository
@@ -21,6 +24,12 @@ from ui.static import build_css
 
 
 def run_app() -> None:
+    configure_category_crawl_manager(
+        CategoryCrawlManager(
+            repository=get_category_crawl_job_repository(),
+            task_queue=get_default_job_queue(),
+        )
+    )
     configure_cdp_connection_manager(
         CdpConnectionManager(
             repository=get_cdp_connection_repository(),
