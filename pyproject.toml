@@ -22,6 +22,7 @@ pytablewriter = "^1.2.1"
 PyYAML = "^6.0.2"
 pybgworker = "^0.3.0"
 nicegui = "^3.7.1"
+scrapling = "^0.4.1"
 
 [tool.poetry.scripts]
 start = "entry:run"

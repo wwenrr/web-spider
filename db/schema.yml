@@ -43,3 +43,35 @@ cdp_connection:
   Type: DATETIME
 - Field: updated_at
   Type: DATETIME
+
+product:
+- Field: id
+  Type: INTEGER
+- Field: thumbnail
+  Type: VARCHAR(2048)
+- Field: name
+  Type: VARCHAR(255)
+- Field: category
+  Type: TEXT
+- Field: price
+  Type: VARCHAR(255)
+- Field: images_url
+  Type: TEXT
+- Field: barcode
+  Type: VARCHAR(255)
+- Field: code
+  Type: VARCHAR(255)
+- Field: remote_id
+  Type: VARCHAR(255)
+- Field: remote_url
+  Type: VARCHAR(2048)
+- Field: description
+  Type: TEXT
+- Field: crawl_status
+  Type: VARCHAR(32)
+- Field: crawl_at
+  Type: DATETIME
+- Field: created_at
+  Type: DATETIME
+- Field: updated_at
+  Type: DATETIME

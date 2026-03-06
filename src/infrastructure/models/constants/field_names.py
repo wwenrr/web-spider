@@ -15,3 +15,20 @@ CDP_CONNECTION_FIELD_NAMES: Final[tuple[str, ...]] = (
     "created_at",
     "updated_at",
 )
+PRODUCT_FIELD_NAMES: Final[tuple[str, ...]] = (
+    "id",
+    "thumbnail",
+    "name",
+    "category",
+    "price",
+    "images_url",
+    "barcode",
+    "code",
+    "remote_id",
+    "remote_url",
+    "description",
+    "crawl_status",
+    "crawl_at",
+    "created_at",
+    "updated_at",
+)

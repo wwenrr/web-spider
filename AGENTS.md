@@ -24,6 +24,7 @@
 ## Plan Output Format
 - File location: `plans/`
 - Filename format: `plan-YYYYMMDD-HHMMSS.md` (local time)
+- Plan content must be written in Vietnamese with proper diacritics.
 - Minimum sections:
   - `# Goal`
   - `# Assumptions`
@@ -33,6 +34,10 @@
 ## Function Ordering Rule
 - Place helper functions below the main function that calls them.
 - Example: if function `a()` calls function `b()`, then define `b()` below `a()`.
+
+## English-Only Code Text Rule
+- All code-level messages, labels, log strings, error text, and constants must be written in English.
+- Do not introduce Vietnamese text into source code, configuration keys, or user-facing constants unless the user explicitly requests it for a specific scope.
 
 ## Verification Rule
 - After any code or configuration change, always run `poetry run lint` to verify before reporting completion.

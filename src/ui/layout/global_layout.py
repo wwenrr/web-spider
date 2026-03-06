@@ -6,6 +6,7 @@ from ui.constants import (
     ROUTE_CDP_CONNECTIONS,
     ROUTE_DASHBOARD,
     ROUTE_MONITOR,
+    ROUTE_PRODUCTS_CRAWL,
     ROUTE_SPY_1999,
     SIDEBAR_LOGO_HTML,
 )
@@ -44,6 +45,14 @@ def _render_sidebar(page: str, on_navigate: Callable[[str], None] | None = None)
 
         ui.label("SPY").classes("nav-section")
         _render_link("1999.co.jp", "travel_explore", ROUTE_SPY_1999, "spy_1999", page == "spy_1999", on_navigate)
+        _render_link(
+            "Products Crawl",
+            "inventory_2",
+            ROUTE_PRODUCTS_CRAWL,
+            "products_crawl",
+            page == "products_crawl",
+            on_navigate,
+        )
 
         ui.label("OPERATIONS").classes("nav-section")
         _render_link(

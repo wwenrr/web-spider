@@ -31,6 +31,42 @@
   .spy-categories {
     grid-template-columns: 1fr;
   }
+  .spy-products-form-row {
+    grid-template-columns: 1fr;
+  }
+  .spy-products-submit {
+    width: 100%;
+  }
+  .spy-products-td-actions > * + * {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+  .spy-products-view,
+  .spy-products-delete {
+    width: 100%;
+  }
+  .spy-gallery-overlay {
+    padding: 12px;
+  }
+  .spy-gallery-head {
+    padding: 14px 14px 10px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .spy-gallery-stage {
+    grid-template-columns: 1fr;
+    padding: 14px 14px 8px;
+  }
+  .spy-gallery-nav {
+    width: 100%;
+  }
+  .spy-gallery-meta {
+    padding: 0 14px 10px;
+  }
+  .spy-gallery-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0 14px 14px;
+  }
   .monitor-metrics {
     grid-template-columns: 1fr;
     gap: 12px;

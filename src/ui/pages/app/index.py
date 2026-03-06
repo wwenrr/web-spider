@@ -8,11 +8,13 @@ from ui.constants import (
     ROUTE_CDP_CONNECTIONS,
     ROUTE_DASHBOARD,
     ROUTE_MONITOR,
+    ROUTE_PRODUCTS_CRAWL,
     ROUTE_ROOT,
     ROUTE_SPY_1999,
 )
 from ui.pages.app.renderers import render_spy_page, render_standard_page
 from ui.pages.monitor.index import _refresh_monitor_page
+from ui.pages.spy_1999.products import refresh_products_crawl_section
 
 LEGACY_CDP_ROUTE = "/cdp-connections"
 DEFAULT_ROUTE = ROUTE_CDP_CONNECTIONS
@@ -41,6 +43,11 @@ PAGE_CONFIGS: dict[str, PageConfig] = {
         title="Job Monitor",
         subtitle="Monitor queue jobs and worker operations in one place.",
     ),
+    "products_crawl": PageConfig(
+        key="products_crawl",
+        title="Products Crawl",
+        subtitle="Queue product page URLs and track crawl statuses.",
+    ),
     "spy_1999": PageConfig(
         key="spy_1999",
         title="Spy 1999.co.jp",
@@ -52,6 +59,7 @@ VIEW_TO_ROUTE: dict[str, str] = {
     "dashboard": ROUTE_DASHBOARD,
     "cdp_connections": DEFAULT_ROUTE,
     "monitor": ROUTE_MONITOR,
+    "products_crawl": ROUTE_PRODUCTS_CRAWL,
     "spy_1999": ROUTE_SPY_1999,
 }
 
@@ -83,6 +91,12 @@ def register_app_page() -> None:
         config = PAGE_CONFIGS["monitor"]
         render_standard_page(config.key, config.title, config.subtitle)
         ui.timer(5.0, _refresh_monitor_page)
+
+    @ui.page(ROUTE_PRODUCTS_CRAWL)
+    def products_crawl_page() -> None:
+        config = PAGE_CONFIGS["products_crawl"]
+        render_standard_page(config.key, config.title, config.subtitle)
+        ui.timer(5.0, refresh_products_crawl_section)
 
     @ui.page(ROUTE_SPY_1999)
     def spy_1999_page(request: Request) -> None:
